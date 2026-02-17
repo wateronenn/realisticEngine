@@ -7,7 +7,9 @@ import component.Unit.Unit;
 public class Archer extends Heroes {
     private int bowStack=1;
     public Archer(){
+
         super("Archer",50,220,5);
+        setHeroClass("Archer");
     }
     @Override
     public void normalAttack(Unit target) {

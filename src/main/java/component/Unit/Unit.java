@@ -76,7 +76,7 @@ public abstract class Unit {
     public void setHp(double hp) {
         this.hp = Math.max(0, Math.min(hp, maxHp));
     }
-    public abstract void scaleStat(double scale);
+    public abstract void upgradeHero(double scale);
 
     public Element getElement() {
         return element;
