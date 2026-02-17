@@ -2,14 +2,15 @@ package component.Unit.heroes;
 
 import component.Element;
 import component.Unit.Buffing;
+import component.Unit.Healing;
 import component.Unit.Target;
 import component.Unit.Unit;
 
 
-public class Tank extends Heroes implements Component.Unit.Healing, Buffing {
+public class Tank extends Heroes implements Healing, Buffing {
 
     public Tank() {
-        super("TankyWaterone",10,400,25);
+        super("TankyWaterone",20,500,20);
     }
 
     @Override
