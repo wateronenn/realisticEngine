@@ -20,7 +20,7 @@ public class CharacterSelectionScene {
 
         VBox root = new VBox();
 
-        Button backBtn = createButton("← Back");
+        Button backBtn = createButton("Back");
         backBtn.setOnAction(e -> {
            StartScene.showMenu(stage,gameEngine);
         }); // go back to menu
@@ -56,9 +56,10 @@ public class CharacterSelectionScene {
         }
         charSelect.setAlignment(Pos.CENTER);
 
-        Button startBtn = createButton("START");
+        Button startBtn = createButton("Start");
         startBtn.setAlignment(Pos.CENTER);
         startBtn.setOnAction(e -> startBtnOnClickHandler(stage,gameEngine));
+
         VBox center = new VBox(title,charSelect,startBtn);
         center.setAlignment(Pos.CENTER);
 
