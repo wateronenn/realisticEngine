@@ -22,7 +22,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         GameEngine gameEngine = new GameEngine();
-        gameEngine.newGame();
         primaryStage.setOnCloseRequest(e -> {
             Platform.exit();
             System.exit(0);

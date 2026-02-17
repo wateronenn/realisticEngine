@@ -39,7 +39,7 @@ public class VictoryScene {
         charSelect.setSpacing(10);
         charSelect.setPadding(new Insets(50));
         ToggleGroup group = new ToggleGroup();
-        for (Heroes h : GameEngine.getTEAM()){
+        for (Heroes h : GameEngine.getHeroTEAM()){
             VBox slot = new VBox();
             slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
@@ -107,7 +107,7 @@ public class VictoryScene {
         }
         else{
             GameEngine.upgradingHero();
-            DefeatScene.show(stage,gameEngine);
+            RollElementScene.show(stage,gameEngine);
             return true;
         }
     }
