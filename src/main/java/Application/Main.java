@@ -1,4 +1,4 @@
-package Application;
+package application;
 
 import gui.CharacterSelectionScene;
 import javafx.application.Application;
