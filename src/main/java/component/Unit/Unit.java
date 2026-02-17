@@ -12,7 +12,7 @@ public abstract class Unit {
 
 
 
-    public Unit(String name,double atk, double maxHp, double def, Element element) {
+    public Unit(String name,double atk, double maxHp, double def) {
         setName(name);
         setAtk(atk);
         setMaxHp(maxHp);
@@ -81,6 +81,16 @@ public abstract class Unit {
     public Element getElement() {
         return element;
     }
+
+    public double attack(Unit target, double rawDamage) {
+        if (target == null || target.isDead()) return 0;
+
+        double modifier = this.element.getModifierAgainst(target.element);
+        double finalDamage = rawDamage * modifier;
+
+        return target.takeDamage(finalDamage);
+    }
+
 
     public double getHpPercent() {
         return maxHp <= 0 ? 0 : (hp * 100.0 / maxHp);

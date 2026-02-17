@@ -8,15 +8,15 @@ import component.Unit.Unit;
 
 public class Tank extends Heroes implements Component.Unit.Healing, Buffing {
 
-    public Tank(String name,double atk, double maxHp, double def, Element element) {
-        super(name,atk, maxHp, def, element);
+    public Tank() {
+        super("TankyWaterone",10,400,25);
     }
 
     @Override
     public void normalAttack(Unit target) {
-        if (target == null || target.isDead()) return;
-        target.takeDamage(effectiveAtk());
+        attack(target, effectiveAtk());
     }
+
 
     @Override
     public void skill(Target target) {

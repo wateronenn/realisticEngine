@@ -11,8 +11,8 @@ public abstract class Heroes extends Unit {
     private double atkMul = 1.0;
     private double atkFlat = 0.0;
     private int atkBuffTurns = 0; // later: rounds
-    public Heroes(String name,double atk, double maxHp, double def, Element element) {
-        super(name,atk, maxHp, def,element);
+    public Heroes(String name,double atk, double maxHp, double def) {
+        super(name,atk, maxHp, def);
     }
 
     public void setAggro(int aggro) {
