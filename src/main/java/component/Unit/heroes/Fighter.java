@@ -6,27 +6,32 @@ import component.Unit.Unit;
 
 public class Fighter extends Heroes implements Component.Unit.Healing {
     public Fighter(){
-        super("Fighter",20,250,20);
+        super("Fighter",40,320,15);
     }
 
     @Override
     public void normalAttack(Unit target) {
-        return;
+        attack(target,effectiveAtk());
     }
-    ;
+
 
     @Override
     public void ultimate(Target target) {
-        return;
+        Unit t = target.single();
+        attack(t,0.4*t.getMaxHp());
     }
 
     @Override
     public void skill(Target target) {
+        Unit t = target.single();
+        attack(t,effectiveAtk());
+        heal(t);
         return;
     }
 
     @Override
     public void heal(Unit target) {
-        return;
+        // heal 80% of this atk  (intended)
+        healAmount(target, 0.8 * this.getAtk());
     }
 }
