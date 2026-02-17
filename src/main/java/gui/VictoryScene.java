@@ -1,10 +1,13 @@
 package gui;
-
+import component.Unit.heroes.Heroes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -13,11 +16,13 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import logic.GameEngine;
 
+
 public class VictoryScene {
     public static void show(Stage stage, GameEngine gameEngine) {
 
         VBox root = new VBox();
         root.setPadding(new Insets(10));
+        GameEngine.setUpgradeHero(null);
 
         Button backBtn = createButton("Back",100,40);
         backBtn.setOnAction(e -> {
@@ -28,20 +33,47 @@ public class VictoryScene {
         root.setAlignment(Pos.TOP_LEFT);
 
         Text title = new Text("VICTORY");
-        title.setStyle("-fx-font-size: 200px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         HBox charSelect = new HBox();
         charSelect.setSpacing(10);
         charSelect.setPadding(new Insets(50));
-
-        for (int i = 0; i < 3; i++) {
+        ToggleGroup group = new ToggleGroup();
+        for (Heroes h : GameEngine.getTEAM()){
             VBox slot = new VBox();
             slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
+            String base = "/Heroes/" + h.getName() + "/";
+            Button charBtn = createCharacterButton(
+                    base + h.getName() + "Still.PNG",
+                    base + h.getName() + "Attack.PNG"
+            );
+            ToggleButton upgradeBtn = createToggleButton("Select", 150, 40);
+            upgradeBtn.setToggleGroup(group);
 
-            Button charBtn = createCharacterButton("/Heroes/Caster/CasterStill.PNG","/Heroes/Caster/CasterAttack.PNG");
-            Button upgradeBtn = createButton("Upgrade",150,40);
-
+            upgradeBtn.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected) {
+                    gameEngine.setUpgradeHero(h);   // set selected hero
+                    upgradeBtn.setText("Unselect");
+                    upgradeBtn.setStyle("""
+                    -fx-font-size: 18px;
+                    -fx-font-weight: bold;
+                    -fx-text-fill: white;
+                    -fx-background-radius: 30;
+                    -fx-background-color: linear-gradient(#ff7a18, #ffb347);
+                """);
+                } else {
+                    gameEngine.setUpgradeHero(null);
+                    upgradeBtn.setText("Select");
+                    upgradeBtn.setStyle("""
+                    -fx-font-size: 18px;
+                    -fx-font-weight: bold;
+                    -fx-text-fill: white;
+                    -fx-background-radius: 30;
+                    -fx-background-color: linear-gradient(#11998e, #38ef7d);
+                """);
+                }
+            });
             slot.getChildren().addAll(charBtn,upgradeBtn);
             charSelect.getChildren().add(slot);
         }
@@ -50,7 +82,7 @@ public class VictoryScene {
         Button nextBtn = createButton("Next",100,40);
         nextBtn.setAlignment(Pos.CENTER);
         nextBtn.setOnMouseClicked(e -> {
-            DefeatScene.show(stage,gameEngine);
+            nextBtnOnClickHandler(stage,gameEngine);
         });
 
         VBox center = new VBox(title,charSelect,nextBtn);
@@ -62,6 +94,22 @@ public class VictoryScene {
         Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
         stage.setScene(scene);
         stage.setMaximized(true);
+    }
+    private static boolean nextBtnOnClickHandler(Stage stage,GameEngine gameEngine){
+        if(gameEngine.getUpgradeHero() == null){
+            Alert nullUpgrdeAlert = new Alert(Alert.AlertType.ERROR);
+            nullUpgrdeAlert.setTitle("No updated character selected");
+            nullUpgrdeAlert.setHeaderText("You are not selecting character to upgrade");
+            nullUpgrdeAlert.setContentText("You must select a character to upgrade !!!");
+
+            nullUpgrdeAlert.showAndWait();
+            return false;
+        }
+        else{
+            GameEngine.upgradingHero();
+            DefeatScene.show(stage,gameEngine);
+            return true;
+        }
     }
 
     private static Button createCharacterButton(String imagePath1,String imagePath2) {
@@ -128,4 +176,39 @@ public class VictoryScene {
         btn.setOnMouseReleased(e -> btn.setScaleX(1.08));
         return btn;
     }
+    private static ToggleButton createToggleButton(String text, int w, int h) {
+        ToggleButton btn = new ToggleButton(text);
+
+        btn.setPrefWidth(w);
+        btn.setPrefHeight(h);
+
+        btn.setStyle("""
+        -fx-font-size: 18px;
+        -fx-font-weight: bold;
+        -fx-text-fill: white;
+        -fx-background-radius: 30;
+        -fx-background-color: linear-gradient(#11998e, #38ef7d);
+    """);
+
+        // hover
+        btn.setOnMouseEntered(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+            btn.setOpacity(0.9);
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+            btn.setOpacity(1.0);
+        });
+
+        // pressed
+        btn.setOnMousePressed(e -> btn.setScaleX(0.95));
+        btn.setOnMouseReleased(e -> btn.setScaleX(1.08));
+
+        return btn;
+    }
+
+
 }
