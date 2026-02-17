@@ -31,11 +31,13 @@ public class RollElementScene {
         HBox charSelect = new HBox();
         charSelect.setSpacing(10);
         charSelect.setPadding(new Insets(50));
-
-
+        Button startBtn = createButton("Next");
+        startBtn.setOnMouseClicked(e -> {
+            VictoryScene.show(stage,gameEngine);
+        });
         charSelect.setAlignment(Pos.CENTER);
 
-        VBox center = new VBox(title,charSelect);
+        VBox center = new VBox(title,charSelect,startBtn);
         center.setAlignment(Pos.CENTER);
 
         root.setSpacing(100);

@@ -86,3 +86,4 @@ public abstract class Unit {
         return maxHp <= 0 ? 0 : (hp * 100.0 / maxHp);
     }
 }
+
