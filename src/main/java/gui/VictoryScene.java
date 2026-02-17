@@ -11,16 +11,17 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import logic.GameEngine;
 
 public class VictoryScene {
-    public static void show(Stage stage) {
+    public static void show(Stage stage, GameEngine gameEngine) {
 
         VBox root = new VBox();
         root.setPadding(new Insets(10));
 
         Button backBtn = createButton("Back",100,40);
         backBtn.setOnAction(e -> {
-            application.Main.showMenu(stage);
+            StartScene.showMenu(stage,gameEngine);
         }); // go back to menu
 
         root.getChildren().add(backBtn);
@@ -38,7 +39,7 @@ public class VictoryScene {
             slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
 
-            Button charBtn = createCharacterButton("/CasterStill.PNG","/CasterAttack.PNG");
+            Button charBtn = createCharacterButton("/Heroes/Caster/CasterStill.PNG","/Heroes/Caster/CasterAttack.PNG");
             Button upgradeBtn = createButton("Upgrade",150,40);
 
             slot.getChildren().addAll(charBtn,upgradeBtn);
@@ -49,7 +50,7 @@ public class VictoryScene {
         Button nextBtn = createButton("Next",100,40);
         nextBtn.setAlignment(Pos.CENTER);
         nextBtn.setOnMouseClicked(e -> {
-            DefeatScene.show(stage);
+            DefeatScene.show(stage,gameEngine);
         });
 
         VBox center = new VBox(title,charSelect,nextBtn);

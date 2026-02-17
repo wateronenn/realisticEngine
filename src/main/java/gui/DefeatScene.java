@@ -9,9 +9,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import logic.GameEngine;
 
 public class DefeatScene {
-    public static void show(Stage stage) {
+    public static void show(Stage stage,GameEngine gameEngine) {
         VBox root = new VBox();
         root.setPadding(new Insets(100));
         root.setAlignment(Pos.CENTER);
@@ -21,7 +22,7 @@ public class DefeatScene {
 
         Button backBtn = createButton("back",100,40);
         backBtn.setOnMouseClicked(e -> {
-            application.Main.showMenu(stage);
+            StartScene.showMenu(stage, gameEngine);
         });
 
         root.getChildren().addAll(title,backBtn);

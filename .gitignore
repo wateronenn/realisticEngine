@@ -1,23 +1,14 @@
+.gradle/
 .gradle
-build/classes/
-build/generated/
-build/reports/
-build/resources/
-build/test-results/
-build/tmp/
+build/
 
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
+# IntelliJ
+.idea/
 *.iml
-*.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
