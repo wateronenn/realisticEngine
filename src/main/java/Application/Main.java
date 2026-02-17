@@ -61,7 +61,7 @@ public class Main extends Application {
         HBox title = new HBox(20, img1);
         title.setAlignment(Pos.CENTER);
 
-        Button startBtn = new Button("START GAME");
+        Button startBtn = new Button("Start Game");
 
         startBtn.setStyle("""
             -fx-font-size: 22px;
@@ -93,12 +93,11 @@ public class Main extends Application {
 
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+        stage.setTitle("legend of Progmeth!");
         stage.setScene(scene);
         stage.setMaximized(true);
 
 
-        stage.setTitle("legend of Progmeth!");
-        stage.setScene(scene);
     }
 
     public static void main(String[] args) {
