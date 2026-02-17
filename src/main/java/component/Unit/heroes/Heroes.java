@@ -70,16 +70,21 @@ public abstract class Heroes extends Unit {
     public abstract void skill(Target target);
     public abstract void ultimate(Target target);
 
-    public void upgradeHero(double scale) {
+    public void upgrade() {
         double frac = (getMaxHp() <= 0) ? 0 : (getHp() / getMaxHp());
 
-        setMaxHp(getMaxHp() * scale);
+        setMaxHp(getMaxHp()+25);
         setHp(frac * getMaxHp());
 
-        setAtk(getAtk() * scale);
-        setDef(getDef() * scale);
-
-
+        setAtk(getAtk()+5);
+        setDef(getDef()+1);
+    }
+    public void scale(){
+        double frac = getMaxHp() <= 0 ? 0 : getHp() / getMaxHp();
+        setMaxHp(getMaxHp() * 1.1);
+        setHp(frac * getMaxHp());
+        setAtk(getAtk() * 1.1);
+        setDef(getDef() +1);
     }
 
     public void setHeroClass(String heroClass) {

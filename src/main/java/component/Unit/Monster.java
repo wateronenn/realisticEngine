@@ -12,14 +12,5 @@ public class Monster extends Unit {
     }
 
 
-    @Override
-    public void upgradeHero(double scale) {
-        double frac = (getMaxHp() <= 0) ? 0 : (getHp() / getMaxHp());
 
-        setMaxHp(getMaxHp() * scale);
-        setHp(frac * getMaxHp());
-
-        setAtk(getAtk() * scale);
-        setDef(getDef() * scale);
-    }
 }

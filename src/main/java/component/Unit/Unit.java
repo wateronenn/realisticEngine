@@ -9,6 +9,8 @@ public abstract class Unit {
     private double def;
     private double maxHp;
     private Element element;
+    private double scaleMonster=1.09;
+    private double scaleHero=1.1;
 
 
 
@@ -76,7 +78,6 @@ public abstract class Unit {
     public void setHp(double hp) {
         this.hp = Math.max(0, Math.min(hp, maxHp));
     }
-    public abstract void upgradeHero(double scale);
 
     public Element getElement() {
         return element;
@@ -94,6 +95,22 @@ public abstract class Unit {
 
     public double getHpPercent() {
         return maxHp <= 0 ? 0 : (hp * 100.0 / maxHp);
+    }
+
+    public void setScaleHero(double scaleHero) {
+        this.scaleHero = scaleHero;
+    }
+
+    public double getScaleHero() {
+        return scaleHero;
+    }
+
+    public double getScaleMonster() {
+        return scaleMonster;
+    }
+
+    public void setScaleMonster(double scaleMonster) {
+        this.scaleMonster = scaleMonster;
     }
 }
 
