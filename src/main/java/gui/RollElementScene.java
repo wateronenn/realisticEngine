@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class RollElementScene {
 
     public static void show(Stage stage , GameEngine gameEngine){
-// TODO : roll element page with RollElementGenerator.getRandomElement() as ArrayList
+        // TODO : roll element page with RollElementGenerator.getRandomElement() as ArrayList
         VBox root = new VBox();
 
 

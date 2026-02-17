@@ -14,6 +14,7 @@ public abstract class Heroes extends Unit {
         setAggro(0);
 
     }
+    public void upgrade(){}
 
     public String getName() {
         return this.name;
