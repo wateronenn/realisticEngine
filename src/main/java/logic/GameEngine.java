@@ -1,6 +1,6 @@
 package logic;
 
-import component.Unit.Heroes;
+import component.Unit.heroes.Heroes;
 import component.Unit.heroes.Archer;
 import component.Unit.heroes.Caster;
 import component.Unit.heroes.Fighter;

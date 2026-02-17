@@ -1,6 +1,6 @@
 package gui;
 
-import component.Unit.Heroes;
+import component.Unit.heroes.Heroes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
