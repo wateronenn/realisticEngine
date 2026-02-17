@@ -8,6 +8,7 @@ import component.Unit.Unit;
 public class Caster extends Heroes implements Buffing {
     public Caster(){
         super("Caster",50,220,5);
+        setHeroClass("Caster");
     }
     @Override
     public void normalAttack(Unit target) {

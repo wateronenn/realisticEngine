@@ -7,7 +7,9 @@ import component.Unit.Unit;
 
 public class Fighter extends Heroes implements Healing {
     public Fighter(){
+
         super("Fighter",40,320,15);
+        setHeroClass("Fighter");
     }
 
     @Override

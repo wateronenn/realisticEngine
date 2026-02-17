@@ -10,10 +10,12 @@ public abstract class Heroes extends Unit {
     private int aggro =0;
     private double atkMul = 1.0;
     private double atkFlat = 0.0;
-    private int atkBuffTurns = 0; // later: rounds
+    private int atkBuffTurns = 0; // later:
+    private String heroClass;
     public Heroes(String name,double atk, double maxHp, double def) {
         super(name,atk, maxHp, def);
     }
+
 
     public void setAggro(int aggro) {
         this.aggro = Math.max(0, aggro);
@@ -68,7 +70,7 @@ public abstract class Heroes extends Unit {
     public abstract void skill(Target target);
     public abstract void ultimate(Target target);
 
-    public void scaleStat(double scale) {
+    public void upgradeHero(double scale) {
         double frac = (getMaxHp() <= 0) ? 0 : (getHp() / getMaxHp());
 
         setMaxHp(getMaxHp() * scale);
@@ -78,5 +80,13 @@ public abstract class Heroes extends Unit {
         setDef(getDef() * scale);
 
 
+    }
+
+    public void setHeroClass(String heroClass) {
+        this.heroClass = heroClass;
+    }
+
+    public String getHeroClass(){
+        return heroClass;
     }
 }

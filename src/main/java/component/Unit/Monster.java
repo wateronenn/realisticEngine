@@ -3,8 +3,8 @@ package component.Unit;
 import component.Element;
 
 public class Monster extends Unit {
-    public Monster(String name,double atk, double maxHp, double def, Element element) {
-        super(name,atk, maxHp, def);
+    public Monster() {
+        super("Monster",35, 320, 8);
     }
 
     public void attack(Unit target) {
@@ -13,7 +13,7 @@ public class Monster extends Unit {
 
 
     @Override
-    public void scaleStat(double scale) {
+    public void upgradeHero(double scale) {
         double frac = (getMaxHp() <= 0) ? 0 : (getHp() / getMaxHp());
 
         setMaxHp(getMaxHp() * scale);
