@@ -1,14 +1,26 @@
-package Component.Unit;
+package component.Unit;
 
+
+import component.Element;
 
 public abstract class Heroes extends Unit {
+    private String name;
     private double shield=0;
     private int aggro =0;
-    public Heroes(double atk, double maxHp, double def, Element element) {
+    public Heroes(String name,double atk, double maxHp, double def, Element element) {
         super(atk, maxHp, def,element);
+        this.name = name;
         setShield(0);
         setAggro(0);
 
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setAggro(int aggro) {

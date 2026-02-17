@@ -1,4 +1,6 @@
-package Component.Unit;
+package component.Unit;
+
+import component.Element;
 
 public abstract class Unit {
     private double atk;
@@ -30,6 +32,7 @@ public abstract class Unit {
         hp -= dmg;
         if (hp < 0) hp = 0;
         double dmgDone = startHp - getHp();
+        return dmgDone;
     }
 
     public double getAtk() {
