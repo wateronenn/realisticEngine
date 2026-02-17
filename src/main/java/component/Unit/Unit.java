@@ -3,21 +3,21 @@ package component.Unit;
 import component.Element;
 
 public abstract class Unit {
+    private String name;
     private double atk;
     private double hp;
     private double def;
-    private boolean isDead;
     private double maxHp;
     private Element element;
 
 
 
-    public Unit(double atk, double maxHp, double def, Element element){
+    public Unit(String name,double atk, double maxHp, double def, Element element) {
+        setName(name);
         setAtk(atk);
+        setMaxHp(maxHp);
         setHp(maxHp);
         setDef(def);
-        setMaxHp(maxHp);
-        setDead(false);
         setElement(element);
     }
 
@@ -25,14 +25,26 @@ public abstract class Unit {
         this.element = element;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 
     public double takeDamage(double dmg) {
-        double startHp = getHp();
+        double startHp = hp;
+        dmg = dmgReduction(dmg);
+        if (dmg <= 0) return 0.0;
+
+        setHp(hp - dmg);
+        return startHp - hp;
+    }
+
+    public double dmgReduction(double dmg) {
         dmg = Math.max(0, dmg);
-        hp -= dmg;
-        if (hp < 0) hp = 0;
-        double dmgDone = startHp - getHp();
-        return dmgDone;
+        return Math.max(0, dmg - def);
     }
 
     public double getAtk() {
@@ -43,45 +55,35 @@ public abstract class Unit {
         return def;
     }
 
-    public boolean isDead() {
-        return isDead;
-    }
+    public boolean isDead() { return hp <= 0; }
 
     public double getHp() {
         return hp;
     }
 
     public void setMaxHp(double maxHp) {
-        this.maxHp = maxHp;
+        this.maxHp = Math.max(0, maxHp);
+        if (hp > this.maxHp) hp = this.maxHp;
     }
-
     public double getMaxHp() { return maxHp; }
 
     public void setAtk(double atk) {
-        this.atk = Math.max(atk,0);
+        this.atk = Math.max(0, atk);
     }
-
-    public void setDead(boolean dead) {
-        isDead = dead;
-    }
-
     public void setDef(double def) {
-        this.def = Math.max(def,0);
+        this.def = Math.max(0, def);
     }
-
     public void setHp(double hp) {
-        this.hp = Math.max(hp,0);
-        if(this.hp==0) setDead(true);
+        this.hp = Math.max(0, Math.min(hp, maxHp));
     }
-    public abstract void scaleStat();
+    public abstract void scaleStat(double scale);
 
     public Element getElement() {
         return element;
     }
 
-    public double getHpPercent(){
-        return this.hp *100 / this.maxHp;
+    public double getHpPercent() {
+        return maxHp <= 0 ? 0 : (hp * 100.0 / maxHp);
     }
-
 }
 
