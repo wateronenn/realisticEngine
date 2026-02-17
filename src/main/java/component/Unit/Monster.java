@@ -4,13 +4,13 @@ import component.Element;
 
 public class Monster extends Unit {
     public Monster(String name,double atk, double maxHp, double def, Element element) {
-        super(name,atk, maxHp, def, element);
+        super(name,atk, maxHp, def);
     }
 
     public void attack(Unit target) {
-        if (target == null || target.isDead()) return;
-        target.takeDamage(getAtk());
+        attack(target, getAtk());
     }
+
 
     @Override
     public void scaleStat(double scale) {
