@@ -94,4 +94,38 @@ public abstract class Heroes extends Unit {
     public String getHeroClass(){
         return heroClass;
     }
+
+    public void EndRound(){
+        setHp(getHp()+0.7*getMaxHp());
+        setShield(0);
+        setAtkFlat(0);
+        setAtkMul(1.0);
+        setAtkBuffTurns(0);
+
+        scale();
+    }
+
+    public void setAtkMul(double atkMul) {
+        this.atkMul = atkMul;
+    }
+
+    public void setAtkBuffTurns(int atkBuffTurns) {
+        this.atkBuffTurns = atkBuffTurns;
+    }
+
+    public void setAtkFlat(double atkFlat) {
+        this.atkFlat = atkFlat;
+    }
+
+    public double getAtkFlat() {
+        return atkFlat;
+    }
+
+    public double getAtkMul() {
+        return atkMul;
+    }
+
+    public int getAtkBuffTurns() {
+        return atkBuffTurns;
+    }
 }
