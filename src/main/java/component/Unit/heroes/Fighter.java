@@ -1,10 +1,11 @@
 package component.Unit.heroes;
 
 import component.Element;
+import component.Unit.Healing;
 import component.Unit.Target;
 import component.Unit.Unit;
 
-public class Fighter extends Heroes implements Component.Unit.Healing {
+public class Fighter extends Heroes implements Healing {
     public Fighter(){
         super("Fighter",40,320,15);
     }
