@@ -50,11 +50,6 @@ public class GameEngine {
     }
 
 
-
-    public void newGame() {
-        TEAM.clear();
-    }
-
     public List<Heroes> getAvailableHeroes() {
         return AllHero;
     }
