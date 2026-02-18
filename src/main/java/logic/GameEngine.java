@@ -1,5 +1,6 @@
 package logic;
 
+import component.Unit.Monster;
 import component.Element;
 import component.Unit.Monster;
 import component.Unit.MonsterFactory;
@@ -44,6 +45,14 @@ public class GameEngine {
                 new Tank(),
                 new Fighter()
         );
+        TEAM = new ArrayList<>();
+
+    }
+
+
+
+    public void newGame() {
+        TEAM.clear();
     }
 
     public List<Heroes> getAvailableHeroes() {
