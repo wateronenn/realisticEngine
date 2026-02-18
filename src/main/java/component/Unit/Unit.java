@@ -32,7 +32,7 @@ public abstract class Unit {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public double takeDamage(double dmg) {
