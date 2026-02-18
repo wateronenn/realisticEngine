@@ -10,7 +10,7 @@ import component.Unit.Unit;
 public class Tank extends Heroes implements Healing, Buffing {
 
     public Tank() {
-        super("TankyWaterone",20,500,20);
+        super("Tank",20,500,20);
         setHeroClass("Tank");
     }
 

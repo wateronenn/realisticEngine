@@ -1,5 +1,6 @@
 package logic;
 
+import component.Unit.Monster;
 import component.Unit.heroes.Heroes;
 import component.Unit.heroes.Archer;
 import component.Unit.heroes.Caster;
@@ -27,7 +28,7 @@ public class GameEngine {
 
     }
 
-    ;
+
 
     public void newGame() {
         TEAM.clear();
@@ -88,4 +89,6 @@ public class GameEngine {
     public int getMaxReroll() {
         return MAX_REROLL;
     }
+
+
 }
