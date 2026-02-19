@@ -33,11 +33,11 @@ public class VictoryScene {
         root.setAlignment(Pos.TOP_LEFT);
 
         Text title = new Text("VICTORY");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 200px; -fx-font-weight: bold;");
 
         HBox charSelect = new HBox();
         charSelect.setSpacing(10);
-        charSelect.setPadding(new Insets(50));
+        charSelect.setPadding(new Insets(20));
         ToggleGroup group = new ToggleGroup();
         for (Heroes h : GameEngine.getHeroTEAM()){
             VBox slot = new VBox();
