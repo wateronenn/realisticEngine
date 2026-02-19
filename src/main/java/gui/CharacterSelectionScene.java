@@ -14,12 +14,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import logic.GameEngine;
+import logic.GameState;
+
+import java.util.Objects;
 
 public class CharacterSelectionScene {
     public static void show(Stage stage,GameEngine gameEngine) {
-
         VBox root = new VBox();
-
+        GameEngine.setGameState(GameState.SELECT_TEAM);
         Button backBtn = createButton("Back");
         backBtn.setOnAction(e -> {
            StartScene.showMenu(stage,gameEngine);
@@ -38,7 +40,7 @@ public class CharacterSelectionScene {
         charSelect.setSpacing(10);
         charSelect.setPadding(new Insets(50));
 
-        for (Heroes h: gameEngine.getAvailableHeroes()) {
+        for (Heroes h: GameEngine.getAvailableHeroes()) {
             VBox slot = new VBox();
             slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
@@ -50,7 +52,7 @@ public class CharacterSelectionScene {
             );
 
             Button pickBtn = createButton("Pick");
-            pickBtn.setOnAction(e -> pickBtnOnClickHandler(gameEngine,h,pickBtn));
+            pickBtn.setOnAction(e -> pickBtnOnClickHandler(h,pickBtn));
             slot.getChildren().addAll(charBtn,pickBtn);
             charSelect.getChildren().add(slot);
         }
@@ -72,7 +74,7 @@ public class CharacterSelectionScene {
         stage.setMaximized(true);
     }
     private static void startBtnOnClickHandler(Stage stage,GameEngine gameEngine){
-        if(gameEngine.checkFullTeam()){
+        if(GameEngine.checkFullTeam()){
             RollElementScene.show(stage,gameEngine);
         }
         else{
@@ -86,7 +88,7 @@ public class CharacterSelectionScene {
         }
     }
 
-    private static void pickBtnOnClickHandler(GameEngine gameEngine,Heroes hero, Button pickBtn){
+    private static void pickBtnOnClickHandler(Heroes hero, Button pickBtn){
         boolean checkAddTeamMember = GameEngine.toggleTeamMember(hero);
         if(!checkAddTeamMember){
             Alert limitAlert = new Alert(Alert.AlertType.ERROR);
@@ -97,7 +99,7 @@ public class CharacterSelectionScene {
             limitAlert.showAndWait();
             return;
         }
-        if(gameEngine.isInTeam(hero)){
+        if(GameEngine.isInTeam(hero)){
             pickBtn.setText("UnPick");
             pickBtn.setOpacity(0.85);
             pickBtn.setStyle("""
@@ -123,12 +125,12 @@ public class CharacterSelectionScene {
     }
 
     private static Button createCharacterButton(String imagePath1,String imagePath2) {
-        Image img1 = new Image( CharacterSelectionScene.class.getResourceAsStream(imagePath1) );
+        Image img1 = new Image(Objects.requireNonNull(CharacterSelectionScene.class.getResourceAsStream(imagePath1)));
         ImageView iv1 = new ImageView(img1);
         iv1.setFitWidth(250); iv1.setFitHeight(500);
         iv1.setPreserveRatio(true); iv1.setSmooth(true);
 
-        Image img2 = new Image( CharacterSelectionScene.class.getResourceAsStream(imagePath2) );
+        Image img2 = new Image(Objects.requireNonNull(CharacterSelectionScene.class.getResourceAsStream(imagePath2)));
         ImageView iv2 = new ImageView(img2);
         iv2.setFitWidth(250);
         iv2.setFitHeight(500);

@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import logic.GameEngine;
 import javafx.stage.Stage;
+import logic.GameState;
 import logic.RandomElementGenerator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,6 +26,7 @@ public class RollElementScene {
 
     public static void show(Stage stage , GameEngine gameEngine){
         GameEngine.setCountReroll(0);
+        GameEngine.setGameState(GameState.ROLL_ELEMENT);
         VBox root = new VBox();
         Text title = new Text("Roll element");
         title.setStyle("-fx-font-size: 40px; -fx-font-weight: bold;");
@@ -33,6 +35,7 @@ public class RollElementScene {
         monsterElementBox.setSpacing(10);
         monsterElementBox.setPadding(new Insets(50));
         monsterElementBox.setAlignment(Pos.CENTER);
+        GameEngine.clearMonsterTeam();
         GameEngine.setMonsterTeam();
         ArrayList<Monster> monstersTeam = GameEngine.getMonsterTeam();
         ArrayList<Element> monsterElement = RandomElementGenerator.getRandomElement(monstersTeam);
