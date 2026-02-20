@@ -14,6 +14,12 @@ public abstract class Heroes extends Unit {
     private String heroClass;
     protected Integer actionOrder;
 
+    protected int skillCdMax;
+    protected int skillCdRemain;
+
+    protected int ultCdMax;
+    protected int ultCdRemain;
+
     public Heroes(String name,double atk, double maxHp, double def) {
         super(name,atk, maxHp, def);
     }
@@ -136,5 +142,29 @@ public abstract class Heroes extends Unit {
 
     public int getAtkBuffTurns() {
         return atkBuffTurns;
+    }
+
+    public boolean canUseSkill() { return skillCdRemain == 0; }
+    public boolean canUseUlt() { return ultCdRemain == 0; }
+
+    public void triggerSkillCd() { skillCdRemain = skillCdMax; }
+    public void triggerUltCd() { ultCdRemain = ultCdMax; }
+
+    public void tickCooldowns() {
+        if (skillCdRemain > 0) skillCdRemain--;
+        if (ultCdRemain > 0) ultCdRemain--;
+    }
+
+    public void resetAllCooldowns() {
+        skillCdRemain = 0;
+        ultCdRemain = 0;
+    }
+
+    public int getSkillCdRemain() {
+        return skillCdRemain;
+    }
+
+    public int getUltCdRemain() {
+        return ultCdRemain;
     }
 }

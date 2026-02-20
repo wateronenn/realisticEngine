@@ -13,6 +13,8 @@ public class Tank extends Heroes implements Healing, Buffing {
         super("TankyWaterone",20,500,20);
         setHeroClass("Tank");
         setActionOrder(1);
+        skillCdMax = 3;
+        ultCdMax = 5;
     }
 
     @Override
@@ -26,6 +28,7 @@ public class Tank extends Heroes implements Healing, Buffing {
         Unit t = target.single();
         if (t == null) return;
         heal(t);
+
     }
 
     @Override
@@ -55,4 +58,6 @@ public class Tank extends Heroes implements Healing, Buffing {
             }
         }
     }
+
+
 }
