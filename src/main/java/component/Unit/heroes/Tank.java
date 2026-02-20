@@ -12,6 +12,7 @@ public class Tank extends Heroes implements Healing, Buffing {
     public Tank() {
         super("Tank",20,500,20);
         setHeroClass("Tank");
+        setActionOrder(1);
     }
 
     @Override
