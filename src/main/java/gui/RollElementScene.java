@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import logic.GameEngine;
 import javafx.stage.Stage;
+import logic.GameState;
 import logic.RandomElementGenerator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

@@ -19,7 +19,7 @@ import logic.GameEngine;
 
 public class StartScene {
 
-    public static void showMenu(Stage stage, GameEngine gameEngine) {
+    public static void showMenu(Stage stage,GameEngine gameEngine) {
         gameEngine.newGame();
         VBox root = new VBox();
         Image bg = new Image(Main.class.getResource("/Background/MainManu.png").toExternalForm());
