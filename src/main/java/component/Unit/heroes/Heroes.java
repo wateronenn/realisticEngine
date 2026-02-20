@@ -12,10 +12,19 @@ public abstract class Heroes extends Unit {
     private double atkFlat = 0.0;
     private int atkBuffTurns = 0; // later:
     private String heroClass;
+    protected Integer actionOrder;
+
     public Heroes(String name,double atk, double maxHp, double def) {
         super(name,atk, maxHp, def);
     }
 
+    protected void setActionOrder(Integer actionOrder) {
+        this.actionOrder = actionOrder;
+    }
+
+    public Integer getActionOrder() {
+        return actionOrder;
+    }
 
     public void setAggro(int aggro) {
         this.aggro = Math.max(0, aggro);

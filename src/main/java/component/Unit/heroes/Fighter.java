@@ -10,6 +10,7 @@ public class Fighter extends Heroes implements Healing {
 
         super("Fighter",40,320,15);
         setHeroClass("Fighter");
+        setActionOrder(2);
     }
 
     @Override

@@ -10,6 +10,7 @@ public class Archer extends Heroes {
 
         super("Archer",50,220,5);
         setHeroClass("Archer");
+        setActionOrder(4);
     }
     @Override
     public void normalAttack(Unit target) {
