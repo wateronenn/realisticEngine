@@ -1,71 +1,88 @@
 package gui;
 
 import component.Unit.heroes.Heroes;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
 
 import java.util.Objects;
 
 public class CharacterSelectionScene {
+    private static Runnable resetCurrentSelection = null;
+
     public static void show(Stage stage,GameEngine gameEngine) {
         VBox root = new VBox();
-        GameEngine.setGameState(GameState.SELECT_TEAM);
-        Button backBtn = createButton("Back");
+        root.setPadding(new Insets(10));
+        root.setSpacing(200);
+
+        Image bg = new Image(application.Main.class.getResource("/Background/Selection.png").toExternalForm());
+        BackgroundImage bgImage = new BackgroundImage(
+                bg,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(
+                        BackgroundSize.AUTO,
+                        BackgroundSize.AUTO,
+                        false,
+                        false,
+                        true,
+                        true
+                )
+        );
+        root.setBackground(new Background(bgImage));
+
+        Button backBtn = createButton("/Button/Back.png"); // back
         backBtn.setOnAction(e -> {
            StartScene.showMenu(stage,gameEngine);
         }); // go back to menu
 
         root.getChildren().add(backBtn);
         root.setAlignment(Pos.TOP_LEFT);
-        root.setPadding(new Insets(10));
-
-        Text title = new Text("SELECT 3 TEAM MEMBERS");
-
-
-        title.setStyle("-fx-font-size: 40px; -fx-font-weight: bold;");
 
         HBox charSelect = new HBox();
-        charSelect.setSpacing(10);
-        charSelect.setPadding(new Insets(50));
 
         for (Heroes h: GameEngine.getAvailableHeroes()) {
             VBox slot = new VBox();
-            slot.setSpacing(20);
+            slot.setSpacing(15);
             slot.setAlignment(Pos.CENTER);
 
             String base = "/Heroes/" + h.getName() + "/";
             Button charBtn = createCharacterButton(
                     base + h.getName() + "Still.PNG",
-                    base + h.getName() + "Attack.PNG"
+                    base + h.getName() + "Attack.PNG",
+                    "/Test/testscroll.png"
             );
 
-            Button pickBtn = createButton("Pick");
-            pickBtn.setOnAction(e -> pickBtnOnClickHandler(h,pickBtn));
+            Button pickBtn = createButton("/Button/Choose.png"); // pick
+            pickBtn.setOnAction(e -> pickBtnOnClickHandler(gameEngine,h,pickBtn));
             slot.getChildren().addAll(charBtn,pickBtn);
             charSelect.getChildren().add(slot);
         }
         charSelect.setAlignment(Pos.CENTER);
 
-        Button startBtn = createButton("Start");
+        Button startBtn = createButton("/Button/Start.png"); // start
         startBtn.setAlignment(Pos.CENTER);
         startBtn.setOnAction(e -> startBtnOnClickHandler(stage,gameEngine));
 
-        VBox center = new VBox(title,charSelect,startBtn);
+        VBox center = new VBox(charSelect,startBtn);
         center.setAlignment(Pos.CENTER);
 
-        root.setSpacing(100);
         root.getChildren().add(center);
 
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
@@ -88,103 +105,182 @@ public class CharacterSelectionScene {
         }
     }
 
-    private static void pickBtnOnClickHandler(Heroes hero, Button pickBtn){
+    private static void pickBtnOnClickHandler(GameEngine gameEngine, Heroes hero, Button pickBtn) {
+
         boolean checkAddTeamMember = GameEngine.toggleTeamMember(hero);
-        if(!checkAddTeamMember){
+
+        if (!checkAddTeamMember) {
             Alert limitAlert = new Alert(Alert.AlertType.ERROR);
             limitAlert.setTitle("Team exceed limit size");
             limitAlert.setHeaderText("Exceed limit team size");
             limitAlert.setContentText("You can pick only up to 3 people !!!");
-
             limitAlert.showAndWait();
             return;
         }
-        if(GameEngine.isInTeam(hero)){
-            pickBtn.setText("UnPick");
-            pickBtn.setOpacity(0.85);
-            pickBtn.setStyle("""
-            -fx-font-size: 18px;
-            -fx-font-weight: bold;
-            -fx-text-fill: white;
-            -fx-background-radius: 30;
-            -fx-background-color: linear-gradient(#ff7a18, #ffb347);
-        """);
-        }
-        else{
-            pickBtn.setText("Pick");
-            pickBtn.setOpacity(1);
-            pickBtn.setStyle("""
-            -fx-font-size: 18px;
-            -fx-font-weight: bold;
-            -fx-text-fill: white;
-            -fx-background-radius: 30;
-            -fx-background-color: linear-gradient(#11998e, #38ef7d);
-        """);
-        }
 
+        ImageView imageView = (ImageView) pickBtn.getGraphic();
+
+        if (gameEngine.isInTeam(hero)) {
+            Image unpickImg = new Image(
+                    CharacterSelectionScene.class.getResourceAsStream("/Button/Discard.png")
+            );
+            imageView.setImage(unpickImg);
+        } else {
+            Image pickImg = new Image(
+                    CharacterSelectionScene.class.getResourceAsStream("/Button/Choose.png")
+            );
+            imageView.setImage(pickImg);
+        }
     }
 
-    private static Button createCharacterButton(String imagePath1,String imagePath2) {
-        Image img1 = new Image(Objects.requireNonNull(CharacterSelectionScene.class.getResourceAsStream(imagePath1)));
-        ImageView iv1 = new ImageView(img1);
-        iv1.setFitWidth(250); iv1.setFitHeight(500);
-        iv1.setPreserveRatio(true); iv1.setSmooth(true);
+    public static Button createCharacterButton(String imagePath1, String imagePath2, String imagePath3) {
 
-        Image img2 = new Image(Objects.requireNonNull(CharacterSelectionScene.class.getResourceAsStream(imagePath2)));
+        Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
+        ImageView iv1 = new ImageView(img1);
+
+        Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
         ImageView iv2 = new ImageView(img2);
-        iv2.setFitWidth(250);
-        iv2.setFitHeight(500);
-        iv2.setPreserveRatio(true);
-        iv2.setSmooth(true);
+
+        Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath3));
+        ImageView iv3 = new ImageView(img3);
+
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(40);
+        shadow.setSpread(0.4);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(15);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.85));
+
+        ImageView[] views = {iv1, iv2, iv3};
+        for (ImageView iv : views) {
+            iv.setFitWidth(350);
+            iv.setFitHeight(350);
+            iv.setPreserveRatio(true);
+            iv.setSmooth(true);
+            iv.setEffect(shadow);
+        }
 
         Button btn = new Button();
-        btn.setGraphic(iv1);
-        btn.setStyle(""" 
-                -fx-background-color: transparent; -fx-padding: 10; 
-        """); // hover animation
+        btn.setStyle("-fx-background-color: transparent;");
+        btn.setPrefSize(350, 350);
+        btn.setMinSize(350, 350);
+        btn.setMaxSize(350, 350);
+
+        StackPane wrapper = new StackPane(iv1);
+        wrapper.setPrefSize(350, 350);
+        btn.setGraphic(wrapper);
+
+        final boolean[] selected = {false};
+
+        Runnable animateToNormal = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        };
+
+        Runnable animateToBig = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.25);
+            st.setToY(1.25);
+            st.play();
+        };
+
+        Runnable resetThisButton = () -> {
+            selected[0] = false;
+            wrapper.getChildren().setAll(iv1);
+            animateToNormal.run();
+        };
+
         btn.setOnMouseEntered(e -> {
-            btn.setGraphic(iv2);
+            if (!selected[0]) wrapper.getChildren().setAll(iv2);
             btn.setScaleX(1.05);
             btn.setScaleY(1.05);
         });
 
         btn.setOnMouseExited(e -> {
-            btn.setGraphic(iv1); btn.setScaleX(1.0);
+            if (!selected[0]) wrapper.getChildren().setAll(iv1);
+            btn.setScaleX(1.0);
             btn.setScaleY(1.0);
+        });
+
+        btn.setOnMouseClicked(e -> {
+            if (!selected[0] && resetCurrentSelection != null) {
+                resetCurrentSelection.run();
+            }
+            selected[0] = !selected[0];
+
+            if (selected[0]) {
+                wrapper.getChildren().setAll(iv3);
+                animateToBig.run();
+                resetCurrentSelection = resetThisButton;
+
+            } else {
+                resetThisButton.run();
+                if (resetCurrentSelection == resetThisButton) {
+                    resetCurrentSelection = null;
+                }
+            }
         });
         return btn;
     }
 
-    private static Button createButton(String string) {
-        Button btn = new Button(string);
 
-        btn.setPrefWidth(100);
-        btn.setPrefHeight(40);
+    private static Button createButton(String path) {
+
+        Image pickImg = new Image(
+                CharacterSelectionScene.class.getResourceAsStream(path)
+        );
+
+        ImageView imageView = new ImageView(pickImg);
+        imageView.setFitWidth(200);
+        imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+
+        Button btn = new Button();
+        btn.setGraphic(imageView);
 
         btn.setStyle("""
-        -fx-font-size: 18px;
-        -fx-font-weight: bold;
-        -fx-text-fill: white;
-        -fx-background-radius: 30;
-        -fx-background-color: linear-gradient(#11998e, #38ef7d);
+            -fx-background-color: transparent;
+            -fx-padding: 0;
+            -fx-cursor: hand;
     """);
 
-        // hover
+        // ===== Glow Effect =====
+        DropShadow glow = new DropShadow();
+        glow.setColor(Color.BLACK);
+        glow.setRadius(20);
+
+        // ===== Hover Scale =====
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), btn);
+        scaleUp.setToX(1.1);
+        scaleUp.setToY(1.1);
+
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(150), btn);
+        scaleDown.setToX(1.0);
+        scaleDown.setToY(1.0);
+
         btn.setOnMouseEntered(e -> {
-            btn.setScaleX(1.08);
-            btn.setScaleY(1.08);
-            btn.setOpacity(0.9);
+            btn.setEffect(glow);
+            scaleUp.playFromStart();
         });
 
         btn.setOnMouseExited(e -> {
-            btn.setScaleX(1.0);
-            btn.setScaleY(1.0);
-            btn.setOpacity(1.0);
+            btn.setEffect(null);
+            scaleDown.playFromStart();
         });
 
-        // click press effect
-        btn.setOnMousePressed(e -> btn.setScaleX(0.95));
-        btn.setOnMouseReleased(e -> btn.setScaleX(1.08));
+        // ===== Press Effect =====
+        TranslateTransition press = new TranslateTransition(Duration.millis(100), btn);
+        press.setToY(3);
+
+        TranslateTransition release = new TranslateTransition(Duration.millis(100), btn);
+        release.setToY(0);
+
+        btn.setOnMousePressed(e -> press.playFromStart());
+        btn.setOnMouseReleased(e -> release.playFromStart());
+
         return btn;
     }
 }
