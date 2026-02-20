@@ -28,6 +28,7 @@ public class Tank extends Heroes implements Healing, Buffing {
         Unit t = target.single();
         if (t == null) return;
         heal(t);
+        triggerUltCd();
 
     }
 
@@ -57,6 +58,7 @@ public class Tank extends Heroes implements Healing, Buffing {
                 buff(hTarget);
             }
         }
+        triggerUltCd();
     }
 
 

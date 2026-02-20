@@ -11,6 +11,8 @@ public class Fighter extends Heroes implements Healing {
         super("Fighter",40,320,15);
         setHeroClass("Fighter");
         setActionOrder(2);
+        skillCdMax = 2;
+        ultCdMax = 4;
     }
 
     @Override
@@ -23,6 +25,7 @@ public class Fighter extends Heroes implements Healing {
     public void ultimate(Target target) {
         Unit t = target.single();
         attack(t,0.4*t.getMaxHp());
+        triggerUltCd();
     }
 
     @Override
@@ -30,6 +33,7 @@ public class Fighter extends Heroes implements Healing {
         Unit t = target.single();
         attack(t,effectiveAtk());
         heal(t);
+        triggerSkillCd();
         return;
     }
 
