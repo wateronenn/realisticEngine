@@ -21,8 +21,11 @@ public class StartScene {
 
     public static void showMenu(Stage stage, GameEngine gameEngine) {
         gameEngine.newGame();
+
         VBox root = new VBox();
-        Image bg = new Image(Main.class.getResource("/Background/MainManu.png").toExternalForm());
+
+        // ===== BACKGROUND =====
+        Image bg = new Image(Main.class.getResource("/Background/Mainmenu.png").toExternalForm());
 
         BackgroundImage bgImage = new BackgroundImage(
                 bg,
@@ -30,46 +33,39 @@ public class StartScene {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(
-                        BackgroundSize.AUTO,
-                        BackgroundSize.AUTO,
-                        false,
-                        false,
-                        true,
-                        true
+                        100, 100, true, true, true, true // IMPORTANT: scale background
                 )
         );
 
         root.setBackground(new Background(bgImage));
 
+        // ===== CONTENT =====
         StackPane stack = new StackPane();
-        stack.setPrefSize(1920, 1080);
 
+        ImageView img1 = new ImageView(
+                new Image(Main.class.getResource("/Sign/Logo.png").toExternalForm())
+        );
 
-        ImageView img1 = new ImageView(new Image(Main.class.getResource("/Sign/Logo.png").toExternalForm()));
-
-        img1.setFitWidth(700);
-        img1.setFitHeight(900);
+        img1.setFitWidth(750);
         img1.setPreserveRatio(true);
-        img1.setSmooth(true);
 
         Button startBtn = createStartButton();
-        startBtn.setOnAction(e -> {
-            CharacterSelectionScene.show(stage,gameEngine);
-        });
+        startBtn.setOnAction(e -> CharacterSelectionScene.show(stage, gameEngine));
 
-        VBox content = new VBox();
-        content.getChildren().addAll(img1,startBtn);
+        VBox content = new VBox( img1, startBtn);
         content.setAlignment(Pos.CENTER);
-        content.setSpacing(70);
 
         stack.getChildren().add(content);
-        root.getChildren().add(stack);
 
-        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-        Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+        root.getChildren().add(stack);
+        root.setAlignment(Pos.TOP_CENTER);
+
+        Scene scene = new Scene(root, 1280, 720); // << fixed size
+
         stage.setTitle("legend of Progmeth!");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setResizable(false);
+        stage.show();
     }
 
     public static Button createStartButton() {
@@ -80,7 +76,7 @@ public class StartScene {
         );
 
         ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(300);
+        imageView.setFitWidth(250);
         imageView.setFitHeight(200);
         imageView.setPreserveRatio(true);
         imageView.setSmooth(true);

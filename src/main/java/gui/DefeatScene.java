@@ -2,53 +2,79 @@ package gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import logic.GameEngine;
 
 public class DefeatScene {
-    public static void show(Stage stage,GameEngine gameEngine) {
+
+    public static void show(Stage stage, GameEngine gameEngine) {
+
         VBox root = new VBox();
         root.setPadding(new Insets(100));
         root.setAlignment(Pos.CENTER);
+        root.setSpacing(40);
 
+        // ===== Background (TOP-CENTER pinned) =====
+        /*Image bg = new Image(application.Main.class.getResource("/Background/Defeat.png").toExternalForm());
+        BackgroundImage bgImage = new BackgroundImage(
+                bg,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(
+                        100, 100, true, true, true, true // IMPORTANT: scale background
+                )
+        );
+        root.setBackground(new Background(bgImage));*/
+
+        // ===== Title =====
         Text title = new Text("DEFEATED");
-        title.setStyle("-fx-font-size: 200px; -fx-font-weight: bold;");
+        title.setStyle("""
+            -fx-font-size: 120px;
+            -fx-font-weight: bold;
+            -fx-fill: #ff4c4c;
+            -fx-stroke: black;
+            -fx-stroke-width: 4;
+        """);
 
-        Button backBtn = createButton("back",100,40);
-        backBtn.setOnMouseClicked(e -> {
-            StartScene.showMenu(stage, gameEngine);
-        });
+        // ===== Back Button =====
+        Button backBtn = createButton("BACK", 180, 60);
+        backBtn.setOnMouseClicked(e -> StartScene.showMenu(stage, gameEngine));
 
-        root.getChildren().addAll(title,backBtn);
+        root.getChildren().addAll(title, backBtn);
 
-        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-        Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+        // ===== Window mode (same as other scenes) =====
+        Scene scene = new Scene(root, 1280, 720);
+
         stage.setScene(scene);
-        stage.setMaximized(true);
-
+        stage.setMaximized(false);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.show();
     }
 
-    private static Button createButton(String string, int PrefWidth, int PrefHeight) {
-        Button btn = new Button(string);
+    private static Button createButton(String text, int width, int height) {
+        Button btn = new Button(text);
 
-        btn.setPrefWidth(PrefWidth);
-        btn.setPrefHeight(PrefHeight);
+        btn.setPrefWidth(width);
+        btn.setPrefHeight(height);
 
         btn.setStyle("""
-        -fx-font-size: 18px;
-        -fx-font-weight: bold;
-        -fx-text-fill: white;
-        -fx-background-radius: 30;
-        -fx-background-color: linear-gradient(#ff7a18, #ffb347);
-    """);
+            -fx-font-size: 18px;
+            -fx-font-weight: bold;
+            -fx-text-fill: white;
+            -fx-background-radius: 30;
+            -fx-background-color: linear-gradient(#ff7a18, #ffb347);
+            -fx-cursor: hand;
+        """);
 
-        // hover
+        // ===== Hover =====
         btn.setOnMouseEntered(e -> {
             btn.setScaleX(1.08);
             btn.setScaleY(1.08);
@@ -61,9 +87,17 @@ public class DefeatScene {
             btn.setOpacity(1.0);
         });
 
-        // click press effect
-        btn.setOnMousePressed(e -> btn.setScaleX(0.95));
-        btn.setOnMouseReleased(e -> btn.setScaleX(1.08));
+        // ===== Press =====
+        btn.setOnMousePressed(e -> {
+            btn.setScaleX(0.95);
+            btn.setScaleY(0.95);
+        });
+
+        btn.setOnMouseReleased(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+        });
+
         return btn;
     }
 }
