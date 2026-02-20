@@ -10,12 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import logic.GameEngine;
 import javafx.stage.Stage;
-import logic.GameState;
 import logic.RandomElementGenerator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,36 +26,51 @@ public class RollElementScene {
 
     public static void show(Stage stage , GameEngine gameEngine){
         GameEngine.setCountReroll(0);
-        GameEngine.setGameState(GameState.ROLL_ELEMENT);
-        VBox root = new VBox();
-        Text title = new Text("Roll element");
-        title.setStyle("-fx-font-size: 40px; -fx-font-weight: bold;");
+        HBox root = new HBox();
+        root.setPadding(new Insets(50));
+        root.setSpacing(300);
+        root.setAlignment(Pos.CENTER);
+
+        VBox leftPanel = new VBox();
+        Image titleImg = new Image(
+                RollElementScene.class.getResourceAsStream("/Sign/RollElement.png")
+        );
+        ImageView titleView = new ImageView(titleImg);
+        titleView.setFitWidth(600);     // adjust size
+        titleView.setPreserveRatio(true);
+        titleView.setSmooth(true);
+
+        Text description1 = new Text("Monster's Element");
+        description1.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+
+        Text description2 = new Text("Hero's Element");
+        description2.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
 
         HBox monsterElementBox = new HBox();
         monsterElementBox.setSpacing(10);
-        monsterElementBox.setPadding(new Insets(50));
+        monsterElementBox.setPadding(new Insets(5));
         monsterElementBox.setAlignment(Pos.CENTER);
-        GameEngine.clearMonsterTeam();
+
         GameEngine.setMonsterTeam();
         ArrayList<Monster> monstersTeam = GameEngine.getMonsterTeam();
         ArrayList<Element> monsterElement = RandomElementGenerator.getRandomElement(monstersTeam);
         for(Element e : monsterElement){
             Image img = RandomElementGenerator.getElementImage(e);
             ImageView imgView = new ImageView(img);
-            imgView.setFitWidth(80);
-            imgView.setFitHeight(80);
+            imgView.setFitWidth(200);
+            imgView.setFitHeight(200);
             imgView.setPreserveRatio(true);
-
             monsterElementBox.getChildren().add(imgView);
         }
 
         monsterElementBox.setAlignment(Pos.CENTER);
         int leftRoll = Math.max(0,(GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
         Text leftRollText = new Text("Roll left : " + leftRoll + "/3");
+        leftRollText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         HBox heroElementBox = new HBox();
         heroElementBox.setSpacing(10);
-        heroElementBox.setPadding(new Insets(50));
+        heroElementBox.setPadding(new Insets(5));
         heroElementBox.setAlignment(Pos.CENTER);
         ArrayList<Heroes> heroesTeam = GameEngine.getHeroTEAM();
         ArrayList<Element> heroElement = RandomElementGenerator.getRandomElement(heroesTeam);
@@ -63,28 +78,43 @@ public class RollElementScene {
         for(Element e : heroElement){
             Image img = RandomElementGenerator.getElementImage(e);
             ImageView imgView = new ImageView(img);
-            imgView.setFitWidth(80);
-            imgView.setFitHeight(80);
+            imgView.setFitWidth(200);
+            imgView.setFitHeight(200);
             imgView.setPreserveRatio(true);
             heroElementBox.getChildren().add(imgView);
         }
         Button rollBtn = createButton("Roll");
-        rollBtn.setOnAction(e->rollBtnHandler(rollBtn,leftRollText,heroElementBox));
+        rollBtn.setOnAction(e->rollBtnHandler(leftRollText,heroElementBox));
 
-        heroElementBox.getChildren().add(rollBtn);
         heroElementBox.setAlignment(Pos.CENTER);
 
         Button startBtn = createButton("Start");
         startBtn.setOnAction(e -> {
             GameEngine.addStageCounter(1);
             BattleScene.show(stage,gameEngine);
-        }); // go back to menu
+        });
 
-        VBox center = new VBox(title, monsterElementBox,leftRollText,heroElementBox,startBtn);
+        HBox bothBtn = new HBox();
+        bothBtn.setSpacing(50);
+        bothBtn.setAlignment(Pos.CENTER);
+        bothBtn.getChildren().addAll(rollBtn,startBtn);
+
+        VBox center = new VBox(monsterElementBox,description2,leftRollText,heroElementBox,bothBtn);
+        center.setSpacing(10);
         center.setAlignment(Pos.CENTER);
 
-        root.setSpacing(100);
-        root.getChildren().add(center);
+        Image img = new Image(RollElementScene.class.getResourceAsStream("/Element/ElementTable.png"));
+        ImageView imageView = new ImageView(img);
+
+        imageView.setFitWidth(500);
+        imageView.setFitHeight(800);
+        imageView.setPreserveRatio(true);
+
+        leftPanel.setSpacing(10);
+        leftPanel.getChildren().addAll(titleView,description1,center);
+        leftPanel.setAlignment(Pos.TOP_CENTER);
+
+        root.getChildren().addAll(leftPanel,imageView);
 
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
@@ -92,7 +122,7 @@ public class RollElementScene {
         stage.setMaximized(true);
     }
 
-    private static void rollBtnHandler(Button rollBtn,Text leftRollText,HBox heroElementBox){
+    private static void rollBtnHandler(Text leftRollText,HBox heroElementBox){
         if(GameEngine.getCountReroll() >= GameEngine.getMaxReroll()){
             Alert limitRollAlert = new Alert(Alert.AlertType.ERROR);
             limitRollAlert.setTitle("Exceed Roll limit");
@@ -108,13 +138,12 @@ public class RollElementScene {
         for(Element e : heroElement){
             Image img = RandomElementGenerator.getElementImage(e);
             ImageView imgView = new ImageView(img);
-            imgView.setFitHeight(80);
-            imgView.setFitHeight(80);
+            imgView.setFitHeight(200);
+            imgView.setFitHeight(200);
             imgView.setPreserveRatio(true);
 
             heroElementBox.getChildren().add(imgView);
         }
-        heroElementBox.getChildren().add(rollBtn);
         int leftRoll = Math.max(0,(GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
         leftRollText.setText("Roll left : " + leftRoll + "/3");;
     }
