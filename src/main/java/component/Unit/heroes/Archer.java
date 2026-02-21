@@ -6,10 +6,14 @@ import component.Unit.Unit;
 
 public class Archer extends Heroes {
     private int bowStack=1;
+
     public Archer(){
 
         super("Archer",50,220,5);
         setHeroClass("Archer");
+        setActionOrder(4);
+        skillCdMax = 0;
+        ultCdMax = 0;
     }
     @Override
     public void normalAttack(Unit target) {
@@ -19,6 +23,7 @@ public class Archer extends Heroes {
     @Override
     public void skill(Target target) {
         this.increaseBowStack();
+        triggerSkillCd();
     }
 
     @Override
@@ -29,6 +34,7 @@ public class Archer extends Heroes {
             double dmgPerUnit = totaldmg/targets.size();
             t.takeDamage(dmgPerUnit);
         }
+        triggerUltCd();
     }
     public void resetBow(){
         bowStack=1;
