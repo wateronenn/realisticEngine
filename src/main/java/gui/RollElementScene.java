@@ -20,8 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import logic.GameEngine;
+import logic.GameState;
 import logic.RandomElementGenerator;
 
 import java.util.ArrayList;

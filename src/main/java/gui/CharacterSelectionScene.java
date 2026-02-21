@@ -18,13 +18,15 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
+
+import java.util.Objects;
 
 public class CharacterSelectionScene {
 
     private static Runnable resetCurrentSelection = null;
 
-    public static void show(Stage stage, GameEngine gameEngine) {
-
+    public static void show(Stage stage,GameEngine gameEngine) {
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setSpacing(130);
@@ -56,6 +58,7 @@ public class CharacterSelectionScene {
 
         for (Heroes h : gameEngine.getAvailableHeroes()) {
 
+        for (Heroes h: GameEngine.getAvailableHeroes()) {
             VBox slot = new VBox();
             slot.setSpacing(15);
             slot.setAlignment(Pos.CENTER);
@@ -98,11 +101,11 @@ public class CharacterSelectionScene {
         stage.centerOnScreen();
         stage.show();
     }
-
-    private static void startBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
-        if (gameEngine.checkFullTeam()) {
-            RollElementScene.show(stage, gameEngine);
-        } else {
+    private static void startBtnOnClickHandler(Stage stage,GameEngine gameEngine){
+        if(GameEngine.checkFullTeam()){
+            RollElementScene.show(stage,gameEngine);
+        }
+        else{
             Alert teamNotFullAlert = new Alert(Alert.AlertType.ERROR);
             teamNotFullAlert.setTitle("Not Enough Member");
             teamNotFullAlert.setHeaderText("Your Team is not Ready");

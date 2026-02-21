@@ -1,6 +1,5 @@
 package logic;
 
-import component.Element;
 import component.Unit.Monster;
 import component.Unit.MonsterFactory;
 import component.Unit.heroes.Heroes;
@@ -9,7 +8,6 @@ import component.Unit.heroes.Caster;
 import component.Unit.heroes.Fighter;
 import component.Unit.heroes.Tank;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +17,12 @@ public class GameEngine {
     public static ArrayList<Heroes> TEAM;
     public static ArrayList<Monster> MONSTER_TEAM;
     public static int STAGE_COUNTER = 0;
-    public List<Heroes> AllHero;
+    public static List<Heroes> AllHero;
     public static Heroes upgradeHero = null;
+    public static GameState gameState;
     private static int COUNT_REROLL=0;
     private static MonsterFactory MONSTER_FACTORY;
+    private static int sumTurnCounter;
 
     public GameEngine() {
        newGame();
@@ -38,15 +38,17 @@ public class GameEngine {
         setCountReroll(0);
         setUpgradeHero(null);
         MONSTER_FACTORY= new MonsterFactory();
-        this.AllHero = List.of(
+        AllHero = List.of(
                 new Caster(),
                 new Archer(),
                 new Tank(),
                 new Fighter()
         );
+        TEAM = new ArrayList<>();
+        gameState = GameState.START_GAME;
     }
 
-    public List<Heroes> getAvailableHeroes() {
+    public static List<Heroes> getAvailableHeroes() {
         return AllHero;
     }
 
@@ -135,6 +137,37 @@ public class GameEngine {
     public static void setMonsterTeam() {
         MONSTER_TEAM = getMonsterFactory().spawnMonster(getStageCounter());
     }
+    public static void clearMonsterTeam() {
+        if (MONSTER_TEAM == null) MONSTER_TEAM = new ArrayList<>();
+        else MONSTER_TEAM.clear();
+    }
+    public static boolean isHeroAllDead(){
+        for(Heroes h : TEAM){
+            if(!h.isDead()){
+                return false;
+            }
+        }
+        return true;
+    }
 
+    public static boolean isMonsterAllDead(){
+        for(Monster m : MONSTER_TEAM){
+            if(!m.isDead()){
+                return false;
+            }
+        }
+        return true;
+    }
 
+    public static GameState getGameState() {
+        return gameState;
+    }
+
+    public static void setGameState(GameState gameState) {
+        GameEngine.gameState = gameState;
+    }
+
+    public static void beginBattle(){
+        BattleEngine.beginBattle();
+    }
 }

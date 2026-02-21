@@ -9,12 +9,12 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import logic.GameEngine;
-import javafx.geometry.Side;
+import logic.GameState;
 
 public class BattleScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.BATTLE);
         VBox root = new VBox();
         root.setPadding(new Insets(100));
         root.setAlignment(Pos.CENTER);

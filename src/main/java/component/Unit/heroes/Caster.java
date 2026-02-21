@@ -9,6 +9,9 @@ public class Caster extends Heroes implements Buffing {
     public Caster(){
         super("Caster",50,220,5);
         setHeroClass("Caster");
+        setActionOrder(3);
+        skillCdMax = 2;
+        ultCdMax = 4;
     }
     @Override
     public void normalAttack(Unit target) {
@@ -20,6 +23,7 @@ public class Caster extends Heroes implements Buffing {
         Unit t = target.single();
         attack(t,effectiveAtk()*0.6);
         buff(this);
+        triggerSkillCd();
     }
 
     @Override
@@ -28,6 +32,7 @@ public class Caster extends Heroes implements Buffing {
         for(Unit unit:targets){
             attack(unit,effectiveAtk()*0.8);
         }
+        triggerUltCd();
     }
 
     @Override
