@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -17,12 +18,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
-import logic.GameState;
 
-public class VictoryScene {
-
+public class UpgradeScene {
     public static void show(Stage stage, GameEngine gameEngine) {
-        GameEngine.setGameState(GameState.END_TURN);
+
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setAlignment(Pos.TOP_CENTER);
@@ -55,19 +54,51 @@ public class VictoryScene {
         charSelect.setPadding(new Insets(10));
         charSelect.setAlignment(Pos.CENTER);
 
+        ToggleGroup group = new ToggleGroup();
+
         for (Heroes h : GameEngine.getHeroTEAM()) {
 
             VBox slot = new VBox();
+            slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
 
             String base = "/Heroes/" + h.getName() + "/";
 
             Button charBtn = createCharacterButton(
-                    base + h.getName() + "Icon.PNG",
-                    base + h.getName() + "Icon.PNG"
+                    base + h.getName() + "Still.PNG",
+                    base + h.getName() + "Attack.PNG"
             );
 
-            slot.getChildren().addAll(charBtn);
+            ToggleButton upgradeBtn = createToggleButton("Select", 170, 50);
+            upgradeBtn.setToggleGroup(group);
+
+            upgradeBtn.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+                if (isSelected) {
+                    gameEngine.setUpgradeHero(h);
+                    upgradeBtn.setText("Unselect");
+                    upgradeBtn.setStyle("""
+                        -fx-font-size: 18px;
+                        -fx-font-weight: bold;
+                        -fx-text-fill: white;
+                        -fx-background-radius: 30;
+                        -fx-background-color: linear-gradient(#ff7a18, #ffb347);
+                        -fx-cursor: hand;
+                    """);
+                } else {
+                    gameEngine.setUpgradeHero(null);
+                    upgradeBtn.setText("Select");
+                    upgradeBtn.setStyle("""
+                        -fx-font-size: 18px;
+                        -fx-font-weight: bold;
+                        -fx-text-fill: white;
+                        -fx-background-radius: 30;
+                        -fx-background-color: linear-gradient(#11998e, #38ef7d);
+                        -fx-cursor: hand;
+                    """);
+                }
+            });
+
+            slot.getChildren().addAll(charBtn, upgradeBtn);
             charSelect.getChildren().add(slot);
         }
 
@@ -108,49 +139,38 @@ public class VictoryScene {
         }
     }
 
-    public static Button createCharacterButton(String imagePath1, String imagePath2) {
-
-        DropShadow shadow = new DropShadow();
-        shadow.setRadius(40);
-        shadow.setSpread(0.4);
-        shadow.setOffsetX(0);
-        shadow.setOffsetY(15);
-        shadow.setColor(Color.rgb(0, 0, 0, 0.85));
+    private static Button createCharacterButton(String imagePath1, String imagePath2) {
 
         Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
         ImageView iv1 = new ImageView(img1);
+        iv1.setFitWidth(240);
+        iv1.setFitHeight(420);
+        iv1.setPreserveRatio(true);
+        iv1.setSmooth(true);
 
         Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
         ImageView iv2 = new ImageView(img2);
-
-        int[] fit = {150,150};
-        ImageView[] views = {iv1, iv2};
-        for (int i = 0; i < 2; i++) {
-            views[i].setFitWidth(fit[i]);
-            views[i].setFitHeight(fit[i]);
-            views[i].setPreserveRatio(true);
-            views[i].setSmooth(true);
-            views[i].setEffect(shadow);
-        }
+        iv2.setFitWidth(240);
+        iv2.setFitHeight(420);
+        iv2.setPreserveRatio(true);
+        iv2.setSmooth(true);
 
         Button btn = new Button();
-        btn.setStyle("-fx-background-color: transparent;");
-        btn.setPrefSize(150, 150);
-        btn.setMinSize(150, 150);
-        btn.setMaxSize(150, 150);
-
-        StackPane wrapper = new StackPane(iv1);
-        wrapper.setPrefSize(350, 350);
-        btn.setGraphic(wrapper);
+        btn.setGraphic(iv1);
+        btn.setStyle("""
+            -fx-background-color: transparent;
+            -fx-padding: 10;
+            -fx-cursor: hand;
+        """);
 
         btn.setOnMouseEntered(e -> {
-             wrapper.getChildren().setAll(iv2);
+            btn.setGraphic(iv2);
             btn.setScaleX(1.05);
             btn.setScaleY(1.05);
         });
 
         btn.setOnMouseExited(e -> {
-            wrapper.getChildren().setAll(iv1);
+            btn.setGraphic(iv1);
             btn.setScaleX(1.0);
             btn.setScaleY(1.0);
         });
@@ -206,6 +226,46 @@ public class VictoryScene {
 
         btn.setOnMousePressed(e -> press.playFromStart());
         btn.setOnMouseReleased(e -> release.playFromStart());
+
+        return btn;
+    }
+
+    private static ToggleButton createToggleButton(String text, int w, int h) {
+        ToggleButton btn = new ToggleButton(text);
+
+        btn.setPrefWidth(w);
+        btn.setPrefHeight(h);
+
+        btn.setStyle("""
+            -fx-font-size: 18px;
+            -fx-font-weight: bold;
+            -fx-text-fill: white;
+            -fx-background-radius: 30;
+            -fx-background-color: linear-gradient(#11998e, #38ef7d);
+            -fx-cursor: hand;
+        """);
+
+        btn.setOnMouseEntered(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+            btn.setOpacity(0.9);
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+            btn.setOpacity(1.0);
+        });
+
+        btn.setOnMousePressed(e -> {
+            btn.setScaleX(0.95);
+            btn.setScaleY(0.95);
+        });
+
+        btn.setOnMouseReleased(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+        });
 
         return btn;
     }
