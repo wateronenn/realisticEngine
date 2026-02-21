@@ -5,6 +5,6 @@ public enum GameState {
     SELECT_TEAM,
     ROLL_ELEMENT,
     BATTLE,
-    END_TURN,
-    GAME_OVER
+    VICTORY,
+    DEFEAT
 }

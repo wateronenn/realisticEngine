@@ -1,6 +1,7 @@
 package component.Unit;
 
 import component.Element;
+import logic.SkillType;
 
 public abstract class Unit {
     private String name;
@@ -112,5 +113,7 @@ public abstract class Unit {
     public void setScaleMonster(double scaleMonster) {
         this.scaleMonster = scaleMonster;
     }
+
+    public void castSkill(SkillType type, Target target) {};
 }
 

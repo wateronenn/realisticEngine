@@ -4,6 +4,7 @@ import component.Element;
 import component.Unit.Healing;
 import component.Unit.Target;
 import component.Unit.Unit;
+import logic.SkillType;
 
 public class Fighter extends Heroes implements Healing {
     public Fighter(){
@@ -41,5 +42,23 @@ public class Fighter extends Heroes implements Healing {
     public void heal(Unit target) {
         // heal 80% of this atk  (intended)
         healAmount(target, 0.8 * this.getAtk());
+    }
+
+    public void castSkill(SkillType type, Target target) {
+
+        switch (type) {
+
+            case NORMAL_ATTACK -> {
+                normalAttack(target.single());
+            }
+
+            case SKILL -> {
+                skill(target);
+            }
+
+            case ULTIMATE -> {
+                ultimate(target);
+            }
+        }
     }
 }

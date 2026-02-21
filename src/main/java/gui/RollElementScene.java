@@ -111,7 +111,8 @@ public class RollElementScene {
         Button startBtn = createButton("/Button/Start.png");
         startBtn.setOnAction(e -> {
             GameEngine.addStageCounter(1);
-            BattleScene.show(stage, gameEngine);
+            //TODO : BattleScene.show(stage, gameEngine);
+            BattleSceneTemp.show(stage,gameEngine);
         });
 
         HBox bothBtn = new HBox(rollBtn, startBtn);

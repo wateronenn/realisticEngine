@@ -2,8 +2,12 @@ package logic;
 
 public enum BattleStage {
     START_BATTLE,
-    HERO_TURN,
+    HERO_CHOOSE_SKILL,
+    HERO_CHOOSE_TARGET,
+    HERO_CHOOSE_ALLY,
+    HERO_RESOLVE_ACTION,
     MONSTER_TURN,
+    CHECK_END,
     WIN_TURN,
     LOSE_TURN
 }
