@@ -20,7 +20,7 @@ public class BattleEngine {
                     Thread.sleep(1000);
                     Platform.runLater(BattleEngine::heroTurn);
                     Thread.sleep(1500);
-                    if(GameEngine.getGameState()== GameState.BATTLE)) {
+                    if(GameEngine.getGameState()== GameState.BATTLE) {
                         Platform.runLater(BattleEngine::monsterTurn);
                     }
                 }
