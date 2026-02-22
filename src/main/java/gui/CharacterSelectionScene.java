@@ -5,7 +5,6 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -14,7 +13,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
@@ -22,6 +22,11 @@ import logic.GameEngine;
 public class CharacterSelectionScene {
 
     private static Runnable resetCurrentSelection = null;
+    private static String discription[][] = {{"Caster","HP :\nATK :\nDEF :","Skill – Arcane Pulse","Deal light magic damage and empower self.","Ult – Arcane Cataclysm","Blast all enemies with devastating magic."},
+                                            {"Archer","HP :\nATK :\nDEF :","Skill – Arrow Stock","Add 1 arrow to the quiver.","Ult – Arrow Rain","Unleash all stored arrows, dealing massive AoE damage."},
+                                            {"Tank","HP :\nATK :\nDEF :","Skill – Guardian’s Mend","Restore HP to a selected ally.","Ult – Aegis Command","Grant shields and boost all allies."},
+                                            {"Fighter","HP :\nATK :\nDEF :","Skill – Lifesteal Strike","Attack an enemy and recover HP.","Ult – Execution Breaker","Ignore all defense and deal massive true damage."}
+    };
 
     public static void show(Stage stage, GameEngine gameEngine) {
 
@@ -54,8 +59,8 @@ public class CharacterSelectionScene {
         HBox charSelect = new HBox();
         charSelect.setAlignment(Pos.CENTER);
 
-        for (Heroes h : gameEngine.getAvailableHeroes()) {
-
+        int index = 0;
+        for (Heroes h : GameEngine.getAvailableHeroes()) {
             VBox slot = new VBox();
             slot.setSpacing(15);
             slot.setAlignment(Pos.CENTER);
@@ -65,7 +70,7 @@ public class CharacterSelectionScene {
             Button charBtn = createCharacterButton(
                     base + h.getName() + "Still.PNG",
                     base + h.getName() + "Attack.PNG",
-                    "/Test/testscroll.png"
+                    index
             );
 
             Button pickBtn = createButton("/Button/Choose.png");
@@ -73,6 +78,8 @@ public class CharacterSelectionScene {
 
             slot.getChildren().addAll(charBtn, pickBtn);
             charSelect.getChildren().add(slot);
+
+            index++;
         }
 
         // ===== Start Button =====
@@ -135,8 +142,8 @@ public class CharacterSelectionScene {
         }
     }
 
-    public static Button createCharacterButton(String imagePath1, String imagePath2, String imagePath3) {
-
+    public static Button createCharacterButton (String imagePath1, String imagePath2, int index){
+      
         DropShadow shadow = new DropShadow();
         shadow.setRadius(40);
         shadow.setSpread(0.4);
@@ -150,9 +157,9 @@ public class CharacterSelectionScene {
         Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
         ImageView iv2 = new ImageView(img2);
 
-        Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath3));
+        Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream("/Sign/Scroll.png"));
         ImageView iv3 = new ImageView(img3);
-
+      
         int[] fit = {350,350,300};
         ImageView[] views = {iv1, iv2, iv3};
         for (int i = 0; i < 3; i++) {
@@ -162,8 +169,37 @@ public class CharacterSelectionScene {
             views[i].setSmooth(true);
             views[i].setEffect(shadow);
         }
+      
+        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+        Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),10);
+        Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),8);
+        Text name = new Text(discription[index][0]);
+        name.setWrappingWidth(fit[2] * 0.65);
+        name.setFont(font1);
+        Text stat = new Text(discription[index][1]);
+        stat.setWrappingWidth(fit[2] * 0.65);
+        stat.setFont(font2);
+        stat.setLineSpacing(5);
+        Text skill = new Text(discription[index][2]);
+        skill.setWrappingWidth(fit[2] * 0.65);
+        skill.setFont(font2);
+        Text skillDis = new Text(discription[index][3]);
+        skillDis.setWrappingWidth(fit[2] * 0.65);
+        skillDis.setFont(font3);
+        Text ultimate = new Text(discription[index][4]);
+        ultimate.setWrappingWidth(fit[2] * 0.65);
+        ultimate.setFont(font2);
+        Text ultimateDis = new Text(discription[index][5]);
+        ultimateDis.setWrappingWidth(fit[2] * 0.65);
+        ultimateDis.setFont(font3);
+
+        VBox content = new VBox(name,stat,skill,skillDis,ultimate,ultimateDis);
+        content.setSpacing(5);
+        StackPane back = new StackPane(iv3,content);
+        StackPane.setMargin(content, new Insets(70));
 
         Button btn = new Button();
+        btn.setAlignment(Pos.CENTER);
         btn.setStyle("-fx-background-color: transparent;");
         btn.setPrefSize(300, 300);
         btn.setMinSize(300, 300);
@@ -215,7 +251,7 @@ public class CharacterSelectionScene {
             selected[0] = !selected[0];
 
             if (selected[0]) {
-                wrapper.getChildren().setAll(iv3);
+                wrapper.getChildren().setAll(back);
                 animateToBig.run();
                 resetCurrentSelection = resetThisButton;
             } else {

@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -84,8 +85,10 @@ public class RollElementScene {
         }
 
         int leftRoll = Math.max(0, (GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
-        Text leftRollText = new Text("Roll left : " + leftRoll + "/3");
-        leftRollText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        Font font = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+        Text leftRollText = new Text("Roll  left : " + leftRoll + " / 3");
+        leftRollText.setFont(font);
+        leftRollText.setStyle("-fx-fill: #4d2c12;");
 
         // ===== Hero Elements =====
         HBox heroElementBox = new HBox();
@@ -184,7 +187,7 @@ public class RollElementScene {
         }
 
         int leftRoll = Math.max(0, (GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
-        leftRollText.setText("Roll left : " + leftRoll + "/3");
+        leftRollText.setText("Roll  left : " + leftRoll + " / 3");
     }
 
     private static Button createButton(String path) {

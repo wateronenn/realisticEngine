@@ -14,6 +14,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
@@ -59,21 +61,23 @@ public class VictoryScene {
 
             VBox slot = new VBox();
             slot.setAlignment(Pos.CENTER);
+            slot.setSpacing(20);
 
             String base = "/Heroes/" + h.getName() + "/";
+            ImageView charImg = createCharacterImage(base + h.getName() + "Icon.PNG");
 
-            Button charBtn = createCharacterButton(
-                    base + h.getName() + "Icon.PNG",
-                    base + h.getName() + "Icon.PNG"
-            );
+            Font font = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+            Text scale = new Text("HP :  before > after\nATK : before > after\nDEF : before > after\n");
+            scale.setFont(font);
+            scale.setLineSpacing(8);
 
-            slot.getChildren().addAll(charBtn);
+            slot.getChildren().addAll(charImg,scale);
             charSelect.getChildren().add(slot);
         }
 
         // ===== Next button =====
         Button nextBtn = createButton("/Button/Next.png");
-        nextBtn.setOnMouseClicked(e -> nextBtnOnClickHandler(stage, gameEngine));
+        nextBtn.setOnMouseClicked(e -> UpgradeScene.show(stage,gameEngine));
 
         VBox center = new VBox( charSelect, nextBtn);
         center.setAlignment(Pos.CENTER);
@@ -93,22 +97,7 @@ public class VictoryScene {
         stage.show();
     }
 
-    private static boolean nextBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
-        if (gameEngine.getUpgradeHero() == null) {
-            Alert nullUpgrdeAlert = new Alert(Alert.AlertType.ERROR);
-            nullUpgrdeAlert.setTitle("No updated character selected");
-            nullUpgrdeAlert.setHeaderText("You are not selecting character to upgrade");
-            nullUpgrdeAlert.setContentText("You must select a character to upgrade !!!");
-            nullUpgrdeAlert.showAndWait();
-            return false;
-        } else {
-            GameEngine.upgradingHero();
-            RollElementScene.show(stage, gameEngine);
-            return true;
-        }
-    }
-
-    public static Button createCharacterButton(String imagePath1, String imagePath2) {
+    public static ImageView createCharacterImage(String imagePath1) {
 
         DropShadow shadow = new DropShadow();
         shadow.setRadius(40);
@@ -120,42 +109,13 @@ public class VictoryScene {
         Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
         ImageView iv1 = new ImageView(img1);
 
-        Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
-        ImageView iv2 = new ImageView(img2);
+        iv1.setFitWidth(150);
+        iv1.setFitHeight(150);
+        iv1.setPreserveRatio(true);
+        iv1.setSmooth(true);
+        iv1.setEffect(shadow);
 
-        int[] fit = {150,150};
-        ImageView[] views = {iv1, iv2};
-        for (int i = 0; i < 2; i++) {
-            views[i].setFitWidth(fit[i]);
-            views[i].setFitHeight(fit[i]);
-            views[i].setPreserveRatio(true);
-            views[i].setSmooth(true);
-            views[i].setEffect(shadow);
-        }
-
-        Button btn = new Button();
-        btn.setStyle("-fx-background-color: transparent;");
-        btn.setPrefSize(150, 150);
-        btn.setMinSize(150, 150);
-        btn.setMaxSize(150, 150);
-
-        StackPane wrapper = new StackPane(iv1);
-        wrapper.setPrefSize(350, 350);
-        btn.setGraphic(wrapper);
-
-        btn.setOnMouseEntered(e -> {
-             wrapper.getChildren().setAll(iv2);
-            btn.setScaleX(1.05);
-            btn.setScaleY(1.05);
-        });
-
-        btn.setOnMouseExited(e -> {
-            wrapper.getChildren().setAll(iv1);
-            btn.setScaleX(1.0);
-            btn.setScaleY(1.0);
-        });
-
-        return btn;
+        return iv1;
     }
 
     private static Button createButton(String path) {
