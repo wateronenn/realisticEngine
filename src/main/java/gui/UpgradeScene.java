@@ -65,8 +65,8 @@ public class UpgradeScene {
             String base = "/Heroes/" + h.getName() + "/";
 
             Button charBtn = createCharacterButton(
-                    base + h.getName() + "Still.PNG",
-                    base + h.getName() + "Attack.PNG"
+                    base + h.getName() + "Icon.PNG",
+                    base + h.getName() + "Icon.PNG"
             );
 
             ToggleButton upgradeBtn = createToggleButton("Select", 170, 50);
@@ -139,38 +139,49 @@ public class UpgradeScene {
         }
     }
 
-    private static Button createCharacterButton(String imagePath1, String imagePath2) {
+    public static Button createCharacterButton(String imagePath1, String imagePath2) {
+
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(40);
+        shadow.setSpread(0.4);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(15);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.85));
 
         Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
         ImageView iv1 = new ImageView(img1);
-        iv1.setFitWidth(240);
-        iv1.setFitHeight(420);
-        iv1.setPreserveRatio(true);
-        iv1.setSmooth(true);
 
         Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
         ImageView iv2 = new ImageView(img2);
-        iv2.setFitWidth(240);
-        iv2.setFitHeight(420);
-        iv2.setPreserveRatio(true);
-        iv2.setSmooth(true);
+
+        int[] fit = {150,150};
+        ImageView[] views = {iv1, iv2};
+        for (int i = 0; i < 2; i++) {
+            views[i].setFitWidth(fit[i]);
+            views[i].setFitHeight(fit[i]);
+            views[i].setPreserveRatio(true);
+            views[i].setSmooth(true);
+            views[i].setEffect(shadow);
+        }
 
         Button btn = new Button();
-        btn.setGraphic(iv1);
-        btn.setStyle("""
-            -fx-background-color: transparent;
-            -fx-padding: 10;
-            -fx-cursor: hand;
-        """);
+        btn.setStyle("-fx-background-color: transparent;");
+        btn.setPrefSize(150, 150);
+        btn.setMinSize(150, 150);
+        btn.setMaxSize(150, 150);
+
+        StackPane wrapper = new StackPane(iv1);
+        wrapper.setPrefSize(350, 350);
+        btn.setGraphic(wrapper);
 
         btn.setOnMouseEntered(e -> {
-            btn.setGraphic(iv2);
+            wrapper.getChildren().setAll(iv2);
             btn.setScaleX(1.05);
             btn.setScaleY(1.05);
         });
 
         btn.setOnMouseExited(e -> {
-            btn.setGraphic(iv1);
+            wrapper.getChildren().setAll(iv1);
             btn.setScaleX(1.0);
             btn.setScaleY(1.0);
         });
