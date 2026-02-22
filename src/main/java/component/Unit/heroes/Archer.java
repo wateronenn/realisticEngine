@@ -3,6 +3,7 @@ package component.Unit.heroes;
 import component.Element;
 import component.Unit.Target;
 import component.Unit.Unit;
+import logic.SkillType;
 
 public class Archer extends Heroes {
     private int bowStack=1;
@@ -46,6 +47,23 @@ public class Archer extends Heroes {
     public int getBowStack() {
         return bowStack;
     }
+    public void castSkill(SkillType type, Target target) {
 
+        switch (type) {
+
+            case NORMAL_ATTACK -> {
+                normalAttack(target.single());
+            }
+
+            case SKILL -> {
+
+                skill(target);
+            }
+
+            case ULTIMATE -> {
+                ultimate(target);
+            }
+        }
+    }
 
 }

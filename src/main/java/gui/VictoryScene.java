@@ -24,7 +24,7 @@ import logic.GameState;
 public class VictoryScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
-        GameEngine.setGameState(GameState.END_TURN);
+
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setAlignment(Pos.TOP_CENTER);

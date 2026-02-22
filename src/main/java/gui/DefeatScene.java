@@ -20,7 +20,7 @@ import logic.GameState;
 
 public class DefeatScene {
     public static void show(Stage stage,GameEngine gameEngine) {
-        GameEngine.setGameState(GameState.GAME_OVER);
+        GameEngine.setGameState(GameState.DEFEAT);
         VBox root = new VBox();
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.BOTTOM_CENTER);

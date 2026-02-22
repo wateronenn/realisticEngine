@@ -5,6 +5,7 @@ import component.Unit.Buffing;
 import component.Unit.Healing;
 import component.Unit.Target;
 import component.Unit.Unit;
+import logic.SkillType;
 
 
 public class Tank extends Heroes implements Healing, Buffing {
@@ -60,6 +61,22 @@ public class Tank extends Heroes implements Healing, Buffing {
         }
         triggerUltCd();
     }
+    public void castSkill(SkillType type, Target target) {
 
+        switch (type) {
+
+            case NORMAL_ATTACK -> {
+                normalAttack(target.single());
+            }
+
+            case SKILL -> {
+                skill(target);
+            }
+
+            case ULTIMATE -> {
+                ultimate(target);
+            }
+        }
+    }
 
 }

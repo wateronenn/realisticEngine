@@ -29,6 +29,7 @@ public class CharacterSelectionScene {
     };
 
     public static void show(Stage stage, GameEngine gameEngine) {
+
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setSpacing(130);
@@ -81,239 +82,238 @@ public class CharacterSelectionScene {
             index++;
         }
 
-            // ===== Start Button =====
-            Button startBtn = createButton("/Button/Start.png");
-            startBtn.setOnAction(e -> startBtnOnClickHandler(stage, gameEngine));
+        // ===== Start Button =====
+        Button startBtn = createButton("/Button/Start.png");
+        startBtn.setOnAction(e -> startBtnOnClickHandler(stage, gameEngine));
 
-            VBox center = new VBox(charSelect, startBtn);
-            center.setAlignment(Pos.CENTER);
+        VBox center = new VBox(charSelect, startBtn);
+        center.setAlignment(Pos.CENTER);
 
-            // Keep center truly centered even when window resized
-            StackPane centerWrap = new StackPane(center);
-            centerWrap.setAlignment(Pos.CENTER);
-            VBox.setVgrow(centerWrap, Priority.ALWAYS);
+        // Keep center truly centered even when window resized
+        StackPane centerWrap = new StackPane(center);
+        centerWrap.setAlignment(Pos.CENTER);
+        VBox.setVgrow(centerWrap, Priority.ALWAYS);
 
-            // Add to root
-            root.getChildren().addAll(topBar, centerWrap);
+        // Add to root
+        root.getChildren().addAll(topBar, centerWrap);
 
-            Scene scene = new Scene(root, 1280, 720);
+        Scene scene = new Scene(root, 1280, 720);
 
-            stage.setScene(scene);
-            stage.setMaximized(false);
-            stage.setResizable(false);
-            stage.centerOnScreen();
-            stage.show();
-
+        stage.setScene(scene);
+        stage.setMaximized(false);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.show();
     }
 
-        private static void startBtnOnClickHandler (Stage stage, GameEngine gameEngine){
-            if (GameEngine.checkFullTeam()) {
-                RollElementScene.show(stage, gameEngine);
-            } else {
-                Alert teamNotFullAlert = new Alert(Alert.AlertType.ERROR);
-                teamNotFullAlert.setTitle("Not Enough Member");
-                teamNotFullAlert.setHeaderText("Your Team is not Ready");
-                teamNotFullAlert.setContentText("You must pick 3 Heroes to go!");
-                teamNotFullAlert.showAndWait();
-            }
+    private static void startBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
+        if (gameEngine.checkFullTeam()) {
+            RollElementScene.show(stage, gameEngine);
+        } else {
+            Alert teamNotFullAlert = new Alert(Alert.AlertType.ERROR);
+            teamNotFullAlert.setTitle("Not Enough Member");
+            teamNotFullAlert.setHeaderText("Your Team is not Ready");
+            teamNotFullAlert.setContentText("You must pick 3 Heroes to go!");
+            teamNotFullAlert.showAndWait();
         }
-
-        private static void pickBtnOnClickHandler (GameEngine gameEngine, Heroes hero, Button pickBtn){
-
-            boolean checkAddTeamMember = GameEngine.toggleTeamMember(hero);
-
-            if (!checkAddTeamMember) {
-                Alert limitAlert = new Alert(Alert.AlertType.ERROR);
-                limitAlert.setTitle("Team exceed limit size");
-                limitAlert.setHeaderText("Exceed limit team size");
-                limitAlert.setContentText("You can pick only up to 3 people !!!");
-                limitAlert.showAndWait();
-                return;
-            }
-
-            ImageView imageView = (ImageView) pickBtn.getGraphic();
-
-            if (gameEngine.isInTeam(hero)) {
-                Image unpickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Discard.png"));
-                imageView.setImage(unpickImg);
-            } else {
-                Image pickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Choose.png"));
-                imageView.setImage(pickImg);
-            }
-        }
-
-        public static Button createCharacterButton (String imagePath1, String imagePath2, int index){
-
-            DropShadow shadow = new DropShadow();
-            shadow.setRadius(40);
-            shadow.setSpread(0.4);
-            shadow.setOffsetX(0);
-            shadow.setOffsetY(15);
-            shadow.setColor(Color.rgb(0, 0, 0, 0.85));
-
-            Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
-            ImageView iv1 = new ImageView(img1);
-
-            Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
-            ImageView iv2 = new ImageView(img2);
-
-            Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream("/Sign/Scroll.png"));
-            ImageView iv3 = new ImageView(img3);
-
-            int[] fit = {350, 350, 300};
-            ImageView[] views = {iv1, iv2, iv3};
-            for (int i = 0; i < 3; i++) {
-                views[i].setFitWidth(fit[i]);
-                views[i].setFitHeight(fit[i]);
-                views[i].setPreserveRatio(true);
-                views[i].setSmooth(true);
-                views[i].setEffect(shadow);
-            }
-
-            Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-            Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),10);
-            Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),8);
-            Text name = new Text(discription[index][0]);
-            name.setWrappingWidth(fit[2] * 0.65);
-            name.setFont(font1);
-            Text stat = new Text(discription[index][1]);
-            stat.setWrappingWidth(fit[2] * 0.65);
-            stat.setFont(font2);
-            stat.setLineSpacing(5);
-            Text skill = new Text(discription[index][2]);
-            skill.setWrappingWidth(fit[2] * 0.65);
-            skill.setFont(font2);
-            Text skillDis = new Text(discription[index][3]);
-            skillDis.setWrappingWidth(fit[2] * 0.65);
-            skillDis.setFont(font3);
-            Text ultimate = new Text(discription[index][4]);
-            ultimate.setWrappingWidth(fit[2] * 0.65);
-            ultimate.setFont(font2);
-            Text ultimateDis = new Text(discription[index][5]);
-            ultimateDis.setWrappingWidth(fit[2] * 0.65);
-            ultimateDis.setFont(font3);
-            VBox content = new VBox(name,stat,skill,skillDis,ultimate,ultimateDis);
-            content.setSpacing(5);
-            StackPane back = new StackPane(iv3,content);
-            StackPane.setMargin(content, new Insets(70));
-
-            Button btn = new Button();
-            btn.setAlignment(Pos.CENTER);
-            btn.setStyle("-fx-background-color: transparent;");
-            btn.setPrefSize(300, 300);
-            btn.setMinSize(300, 300);
-            btn.setMaxSize(300, 300);
-
-            StackPane wrapper = new StackPane(iv1);
-            wrapper.setPrefSize(350, 350);
-            btn.setGraphic(wrapper);
-
-            final boolean[] selected = {false};
-
-            Runnable animateToNormal = () -> {
-                ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
-                st.setToX(1.0);
-                st.setToY(1.0);
-                st.play();
-            };
-
-            Runnable animateToBig = () -> {
-                ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
-                st.setToX(1.25);
-                st.setToY(1.25);
-                st.play();
-            };
-
-            Runnable resetThisButton = () -> {
-                selected[0] = false;
-                wrapper.getChildren().setAll(iv1);
-                animateToNormal.run();
-            };
-
-            btn.setOnMouseEntered(e -> {
-                if (!selected[0]) wrapper.getChildren().setAll(iv2);
-                btn.setScaleX(1.05);
-                btn.setScaleY(1.05);
-            });
-
-            btn.setOnMouseExited(e -> {
-                if (!selected[0]) wrapper.getChildren().setAll(iv1);
-                btn.setScaleX(1.0);
-                btn.setScaleY(1.0);
-            });
-
-            btn.setOnMouseClicked(e -> {
-                if (!selected[0] && resetCurrentSelection != null) {
-                    resetCurrentSelection.run();
-                }
-
-                selected[0] = !selected[0];
-
-                if (selected[0]) {
-                    wrapper.getChildren().setAll(back);
-                    animateToBig.run();
-                    resetCurrentSelection = resetThisButton;
-                } else {
-                    resetThisButton.run();
-                    if (resetCurrentSelection == resetThisButton) {
-                        resetCurrentSelection = null;
-                    }
-                }
-            });
-
-            return btn;
-        }
-
-        private static Button createButton (String path){
-
-            Image img = new Image(CharacterSelectionScene.class.getResourceAsStream(path));
-            ImageView imageView = new ImageView(img);
-            imageView.setFitWidth(130);
-            imageView.setFitHeight(100);
-            imageView.setPreserveRatio(true);
-            imageView.setSmooth(true);
-
-            Button btn = new Button();
-            btn.setGraphic(imageView);
-
-            btn.setStyle("""
-                        -fx-background-color: transparent;
-                        -fx-padding: 0;
-                        -fx-cursor: hand;
-                    """);
-
-            DropShadow glow = new DropShadow();
-            glow.setColor(Color.BLACK);
-            glow.setRadius(20);
-
-            ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), btn);
-            scaleUp.setToX(1.1);
-            scaleUp.setToY(1.1);
-
-            ScaleTransition scaleDown = new ScaleTransition(Duration.millis(150), btn);
-            scaleDown.setToX(1.0);
-            scaleDown.setToY(1.0);
-
-            btn.setOnMouseEntered(e -> {
-                btn.setEffect(glow);
-                scaleUp.playFromStart();
-            });
-
-            btn.setOnMouseExited(e -> {
-                btn.setEffect(null);
-                scaleDown.playFromStart();
-            });
-
-            TranslateTransition press = new TranslateTransition(Duration.millis(100), btn);
-            press.setToY(3);
-
-            TranslateTransition release = new TranslateTransition(Duration.millis(100), btn);
-            release.setToY(0);
-
-            btn.setOnMousePressed(e -> press.playFromStart());
-            btn.setOnMouseReleased(e -> release.playFromStart());
-
-            return btn;
-        }
-
     }
+
+    private static void pickBtnOnClickHandler(GameEngine gameEngine, Heroes hero, Button pickBtn) {
+
+        boolean checkAddTeamMember = GameEngine.toggleTeamMember(hero);
+
+        if (!checkAddTeamMember) {
+            Alert limitAlert = new Alert(Alert.AlertType.ERROR);
+            limitAlert.setTitle("Team exceed limit size");
+            limitAlert.setHeaderText("Exceed limit team size");
+            limitAlert.setContentText("You can pick only up to 3 people !!!");
+            limitAlert.showAndWait();
+            return;
+        }
+
+        ImageView imageView = (ImageView) pickBtn.getGraphic();
+
+        if (gameEngine.isInTeam(hero)) {
+            Image unpickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Discard.png"));
+            imageView.setImage(unpickImg);
+        } else {
+            Image pickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Choose.png"));
+            imageView.setImage(pickImg);
+        }
+    }
+
+    public static Button createCharacterButton (String imagePath1, String imagePath2, int index){
+      
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(40);
+        shadow.setSpread(0.4);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(15);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.85));
+
+        Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
+        ImageView iv1 = new ImageView(img1);
+
+        Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
+        ImageView iv2 = new ImageView(img2);
+
+        Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream("/Sign/Scroll.png"));
+        ImageView iv3 = new ImageView(img3);
+      
+        int[] fit = {350,350,300};
+        ImageView[] views = {iv1, iv2, iv3};
+        for (int i = 0; i < 3; i++) {
+            views[i].setFitWidth(fit[i]);
+            views[i].setFitHeight(fit[i]);
+            views[i].setPreserveRatio(true);
+            views[i].setSmooth(true);
+            views[i].setEffect(shadow);
+        }
+      
+        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+        Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),10);
+        Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),8);
+        Text name = new Text(discription[index][0]);
+        name.setWrappingWidth(fit[2] * 0.65);
+        name.setFont(font1);
+        Text stat = new Text(discription[index][1]);
+        stat.setWrappingWidth(fit[2] * 0.65);
+        stat.setFont(font2);
+        stat.setLineSpacing(5);
+        Text skill = new Text(discription[index][2]);
+        skill.setWrappingWidth(fit[2] * 0.65);
+        skill.setFont(font2);
+        Text skillDis = new Text(discription[index][3]);
+        skillDis.setWrappingWidth(fit[2] * 0.65);
+        skillDis.setFont(font3);
+        Text ultimate = new Text(discription[index][4]);
+        ultimate.setWrappingWidth(fit[2] * 0.65);
+        ultimate.setFont(font2);
+        Text ultimateDis = new Text(discription[index][5]);
+        ultimateDis.setWrappingWidth(fit[2] * 0.65);
+        ultimateDis.setFont(font3);
+
+        VBox content = new VBox(name,stat,skill,skillDis,ultimate,ultimateDis);
+        content.setSpacing(5);
+        StackPane back = new StackPane(iv3,content);
+        StackPane.setMargin(content, new Insets(70));
+
+        Button btn = new Button();
+        btn.setAlignment(Pos.CENTER);
+        btn.setStyle("-fx-background-color: transparent;");
+        btn.setPrefSize(300, 300);
+        btn.setMinSize(300, 300);
+        btn.setMaxSize(300, 300);
+
+        StackPane wrapper = new StackPane(iv1);
+        wrapper.setPrefSize(350, 350);
+        btn.setGraphic(wrapper);
+
+        final boolean[] selected = {false};
+
+        Runnable animateToNormal = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        };
+
+        Runnable animateToBig = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.25);
+            st.setToY(1.25);
+            st.play();
+        };
+
+        Runnable resetThisButton = () -> {
+            selected[0] = false;
+            wrapper.getChildren().setAll(iv1);
+            animateToNormal.run();
+        };
+
+        btn.setOnMouseEntered(e -> {
+            if (!selected[0]) wrapper.getChildren().setAll(iv2);
+            btn.setScaleX(1.05);
+            btn.setScaleY(1.05);
+        });
+
+        btn.setOnMouseExited(e -> {
+            if (!selected[0]) wrapper.getChildren().setAll(iv1);
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+        });
+
+        btn.setOnMouseClicked(e -> {
+            if (!selected[0] && resetCurrentSelection != null) {
+                resetCurrentSelection.run();
+            }
+
+            selected[0] = !selected[0];
+
+            if (selected[0]) {
+                wrapper.getChildren().setAll(back);
+                animateToBig.run();
+                resetCurrentSelection = resetThisButton;
+            } else {
+                resetThisButton.run();
+                if (resetCurrentSelection == resetThisButton) {
+                    resetCurrentSelection = null;
+                }
+            }
+        });
+
+        return btn;
+    }
+
+    private static Button createButton(String path) {
+
+        Image img = new Image(CharacterSelectionScene.class.getResourceAsStream(path));
+        ImageView imageView = new ImageView(img);
+        imageView.setFitWidth(130);
+        imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+
+        Button btn = new Button();
+        btn.setGraphic(imageView);
+
+        btn.setStyle("""
+            -fx-background-color: transparent;
+            -fx-padding: 0;
+            -fx-cursor: hand;
+        """);
+
+        DropShadow glow = new DropShadow();
+        glow.setColor(Color.BLACK);
+        glow.setRadius(20);
+
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), btn);
+        scaleUp.setToX(1.1);
+        scaleUp.setToY(1.1);
+
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(150), btn);
+        scaleDown.setToX(1.0);
+        scaleDown.setToY(1.0);
+
+        btn.setOnMouseEntered(e -> {
+            btn.setEffect(glow);
+            scaleUp.playFromStart();
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setEffect(null);
+            scaleDown.playFromStart();
+        });
+
+        TranslateTransition press = new TranslateTransition(Duration.millis(100), btn);
+        press.setToY(3);
+
+        TranslateTransition release = new TranslateTransition(Duration.millis(100), btn);
+        release.setToY(0);
+
+        btn.setOnMousePressed(e -> press.playFromStart());
+        btn.setOnMouseReleased(e -> release.playFromStart());
+
+        return btn;
+    }
+}

@@ -20,7 +20,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
-import logic.GameState;
 import logic.RandomElementGenerator;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ public class RollElementScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
 
+        GameEngine.addStageCounter(1);
         GameEngine.setCountReroll(0);
 
         HBox root = new HBox();
@@ -114,8 +114,7 @@ public class RollElementScene {
 
         Button startBtn = createButton("/Button/Start.png");
         startBtn.setOnAction(e -> {
-            GameEngine.addStageCounter(1);
-            BattleScene.show(stage, gameEngine);
+            BattleSceneTemp.show(stage,gameEngine);
         });
 
         HBox bothBtn = new HBox(rollBtn, startBtn);
