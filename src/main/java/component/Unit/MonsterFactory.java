@@ -9,8 +9,8 @@ public class MonsterFactory {
     // TODO :create temporary function for spawn monster ( can edit this later)
     public ArrayList<Monster> spawnMonster(int stageCounter){
         ArrayList<Monster> monstersTeam = new ArrayList<>();
-        Monster m = new Monster();
-        for(int i=0;i<3;i++){
+        for(int i=1;i<=3;i++){
+            Monster m = new Monster(i);
             monstersTeam.add(m);
         }
         return monstersTeam;

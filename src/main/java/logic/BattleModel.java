@@ -5,6 +5,7 @@ import component.Unit.Unit;
 import component.Unit.heroes.Heroes;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class BattleModel {
@@ -15,15 +16,16 @@ public class BattleModel {
 
     public BattleModel(List<Heroes> heroes, List<Monster> monsters) {
         this.HERO_TEAM = heroes;
+        HERO_TEAM.sort(Comparator.comparing(Heroes::getActionOrder));
         this.MONSTER_TEAM = monsters;
     }
 
     public List<Heroes> getHERO_TEAM() {
+
         return HERO_TEAM;
     }
 
     public List<Monster> getMONSTER_TEAM() {
-
         return MONSTER_TEAM;
     }
 

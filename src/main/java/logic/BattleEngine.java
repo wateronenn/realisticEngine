@@ -45,9 +45,10 @@ public class BattleEngine {
     //UI use this for choosing skill (activate)
     public boolean onClickHeroSkill(SkillType skill){
         if(stage != BattleStage.HERO_CHOOSE_SKILL) return false;
-
+        System.out.println("Hero choosing skill");
         Heroes h = getActiveHero();
         if(h==null) return false;
+        System.out.println("Hero's turn : " + h.getHeroClass());
         if(skill == SkillType.SKILL){
             if(!h.canUseSkill()){
                 emitLog("Skill is on cooldown");
@@ -69,19 +70,23 @@ public class BattleEngine {
             setBattleStage(BattleStage.HERO_CHOOSE_ALLY);
         }
         else{
-            setBattleStage(BattleStage.HERO_RESOLVE_ACTION);
-            Target target = null;
+            Target target;
             if(t == TargetType.ENEMY_ALL) {
                 target = Target.many(model.getMONSTER_TEAM());
             }
             else if (t == TargetType.ALLY_ALL){
                 target = Target.many(model.getHERO_TEAM());
             }
-            else if(t == TargetType.NONE){
+            else{
                 target = Target.one(h);
             }
-
+            setBattleStage(BattleStage.HERO_RESOLVE_ACTION);
             resolveHeroAction(h, target, skill);
+            afterHeroAction();
+            emitState(stage);
+            emitUpdate();
+            return true;
+
         }
         emitState(stage);
         emitUpdate();
@@ -91,8 +96,12 @@ public class BattleEngine {
 
     // Use after Click select Monster
     public boolean onClickChoosingTarget(int monsterIndex){
+
         if(getBattleStage() != BattleStage.HERO_CHOOSE_TARGET) return false;
+        System.out.println("Hero choosing Target");
+
         Monster m = getActiveMonster(monsterIndex);
+        System.out.println("Attack Monster at index " + monsterIndex);
         Target target = Target.one(m);
         Heroes h = getActiveHero();
         SkillType skill = model.getPendingSkill();
@@ -106,6 +115,7 @@ public class BattleEngine {
 
     public boolean onClickChoosingAlly(Heroes ally){
         if(getBattleStage() != BattleStage.HERO_CHOOSE_ALLY) return false;
+        System.out.println("Hero choosing Ally");
         Target target = Target.one(ally);
         Heroes h = getActiveHero();
         SkillType skill = model.getPendingSkill();
@@ -130,12 +140,16 @@ public class BattleEngine {
 
     private void resolveHeroAction(Heroes h, Target target, SkillType skill){
         h.castSkill(skill,target);
+        System.out.println("[" + getBattleStage() + "] "
+                + h.getName() + " Cast "+skill +" target = " + target);
         emitUpdate();
     }
 
-    private void afterHeroAction(){
+    private void afterHeroAction() {
         model.setPendingSkill(null);
-        if(isMonsterAllDead()){
+
+        // 1) victory check
+        if (isMonsterAllDead()) {
             setBattleStage(BattleStage.WIN_TURN);
             GameEngine.setGameState(GameState.VICTORY);
             emitState(stage);
@@ -143,27 +157,27 @@ public class BattleEngine {
             return;
         }
 
-        setBattleStage(BattleStage.MONSTER_TURN);
-        emitState(stage);
-        emitUpdate();
-        monsterTurn();
+        // 2) next hero OR monster turn
+        int nextHeroIdx = findNextAliveHeroIndex(model.getActiveHeroIndex());
+        boolean noMoreHeroesThisRound =
+                (nextHeroIdx == -1) || (nextHeroIdx <= model.getActiveHeroIndex());
 
-        if(isHeroAllDead()){
-            setBattleStage(BattleStage.LOSE_TURN);
-            GameEngine.setGameState(GameState.DEFEAT);
+        if (!noMoreHeroesThisRound) {
+            model.setActiveHeroIndex(nextHeroIdx);
+            setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
             emitState(stage);
             emitUpdate();
             return;
         }
-        tickCooldownsForHeroes();
-        model.setActiveHeroIndex(findNextAliveHeroIndex(model.getActiveHeroIndex()));
 
-        setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
+        // 3) round finished -> go to MONSTER_TURN and STOP
+        setBattleStage(BattleStage.MONSTER_TURN);
         emitState(stage);
         emitUpdate();
+        return;  // ✅ THIS is the missing piece
     }
 
-    private void monsterTurn(){
+    public void monsterTurn(){
         for(Monster m : model.getMONSTER_TEAM()){
             if(m.isDead()) continue;
             Heroes target = pickRandomAliveHero();
@@ -172,6 +186,19 @@ public class BattleEngine {
             emitUpdate();
             if(isHeroAllDead()) return;
         }
+    }
+
+    public void executeMonsterTurnAndContinue() {
+
+        if (isHeroAllDead()) {
+            setBattleStage(BattleStage.LOSE_TURN);
+            emitState(stage);
+            emitUpdate();
+            return;
+        }
+
+        tickCooldownsForHeroes();
+        model.setActiveHeroIndex(findNextAliveHeroIndex(-1));
         setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
         emitState(stage);
         emitUpdate();
