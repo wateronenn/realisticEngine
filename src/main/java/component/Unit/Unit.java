@@ -1,7 +1,9 @@
 package component.Unit;
 
 import component.Element;
+import logic.BattleEngine;
 import logic.SkillType;
+
 
 public abstract class Unit {
     private String name;
@@ -89,8 +91,8 @@ public abstract class Unit {
 
         double modifier = this.element.getModifierAgainst(target.element);
         double finalDamage = rawDamage * modifier;
-
         return target.takeDamage(finalDamage);
+
     }
 
 

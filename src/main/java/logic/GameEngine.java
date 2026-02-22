@@ -71,7 +71,6 @@ public class GameEngine {
     }
 
     public static ArrayList<Heroes> getHeroTEAM() {
-        TEAM.sort(Comparator.comparing(Heroes::getActionOrder));
         return TEAM;
     }
 
