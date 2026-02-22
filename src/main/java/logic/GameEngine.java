@@ -9,20 +9,24 @@ import component.Unit.heroes.Fighter;
 import component.Unit.heroes.Tank;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+
+import static java.util.Collections.shuffle;
 
 public class GameEngine {
     private static final int MAX_TEAM_SIZE = 3;
     private static final int MAX_REROLL = 3;
     public static ArrayList<Heroes> TEAM;
     public static ArrayList<Monster> MONSTER_TEAM;
+    public static ArrayList<Heroes> RANDOM_HERO;
     public static int STAGE_COUNTER = 0;
     public static List<Heroes> AllHero;
     public static Heroes upgradeHero = null;
     public static GameState gameState;
     private static int COUNT_REROLL=0;
     private static MonsterFactory MONSTER_FACTORY;
-    private static int sumTurnCounter;
 
     public GameEngine() {
        newGame();
@@ -67,6 +71,7 @@ public class GameEngine {
     }
 
     public static ArrayList<Heroes> getHeroTEAM() {
+        TEAM.sort(Comparator.comparing(Heroes::getActionOrder));
         return TEAM;
     }
 
@@ -167,7 +172,12 @@ public class GameEngine {
         GameEngine.gameState = gameState;
     }
 
-    public static void beginBattle(){
-        BattleEngine.beginBattle();
+
+    public static Heroes getRandomHero(){
+        ArrayList<Heroes> randomList = getHeroTEAM();
+        shuffle(randomList);
+        return randomList.getFirst();
     }
+
+
 }

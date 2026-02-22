@@ -4,6 +4,7 @@ package component.Unit.heroes;
 import component.Element;
 import component.Unit.Target;
 import component.Unit.Unit;
+import logic.SkillType;
 
 public abstract class Heroes extends Unit {
     private double shield=0;
@@ -166,5 +167,8 @@ public abstract class Heroes extends Unit {
 
     public int getUltCdRemain() {
         return ultCdRemain;
+    }
+
+    public void castSkill(SkillType type, Target target) {
     }
 }

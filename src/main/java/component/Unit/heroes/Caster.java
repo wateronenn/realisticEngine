@@ -4,6 +4,7 @@ import component.Element;
 import component.Unit.Buffing;
 import component.Unit.Target;
 import component.Unit.Unit;
+import logic.SkillType;
 
 public class Caster extends Heroes implements Buffing {
     public Caster(){
@@ -40,6 +41,24 @@ public class Caster extends Heroes implements Buffing {
         if (target instanceof Heroes h) {
             // +10% ATK for 1 turn (intended)
             h.applyAtkBuff(1.2, 0.0, 1);
+        }
+    }
+
+    public void castSkill(SkillType type, Target target) {
+
+        switch (type) {
+
+            case NORMAL_ATTACK -> {
+                normalAttack(target.single());
+            }
+
+            case SKILL -> {
+                skill(target);
+            }
+
+            case ULTIMATE -> {
+                ultimate(target);
+            }
         }
     }
 }
