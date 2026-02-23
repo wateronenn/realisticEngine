@@ -15,10 +15,8 @@ public class BattleScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.BATTLE);
-        VBox root = new VBox();
-        root.setPadding(new Insets(100));
-        root.setAlignment(Pos.CENTER);
-        root.setSpacing(30);
+        Pane root = new Pane();
+        root.setPadding(new Insets(10));
 
         // ===== Background (TOP-CENTER pinned) =====
         /*Image bg = new Image(application.Main.class.getResource("/Background/Battle.png").toExternalForm());
@@ -32,23 +30,6 @@ public class BattleScene {
                 )
         );
         root.setBackground(new Background(bgImage));*/
-
-        Text title = new Text("Battle");
-        title.setStyle("""
-            -fx-font-size: 80px;
-            -fx-font-weight: bold;
-            -fx-fill: white;
-            -fx-stroke: black;
-            -fx-stroke-width: 3;
-        """);
-
-        Button winBtn = createButton("win", 180, 60);
-        winBtn.setOnMouseClicked(e -> VictoryScene.show(stage, gameEngine));
-
-        Button loseBtn = createButton("lose", 180, 60);
-        loseBtn.setOnMouseClicked(e -> DefeatScene.show(stage, gameEngine));
-
-        root.getChildren().addAll(title, winBtn, loseBtn);
 
         // ===== Window mode (same as your other scenes) =====
         Scene scene = new Scene(root, 1280, 720);
