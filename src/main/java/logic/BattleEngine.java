@@ -1,9 +1,8 @@
 package logic;
 
-import component.Unit.Monster;
-import component.Unit.Target;
-import component.Unit.Unit;
-import component.Unit.heroes.Heroes;
+import component.Monster;
+import component.Target;
+import component.heroes.Heroes;
 
 import java.util.List;
 import java.util.Objects;

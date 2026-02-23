@@ -1,9 +1,8 @@
-package component.Unit.heroes;
+package component.heroes;
 
-import component.Element;
-import component.Unit.Healing;
-import component.Unit.Target;
-import component.Unit.Unit;
+import component.Healing;
+import component.Target;
+import component.Unit;
 import logic.SkillType;
 
 public class Fighter extends Heroes implements Healing {

@@ -1,10 +1,8 @@
-package component.Unit.heroes;
+package component.heroes;
 
 
-import component.Element;
-import component.Unit.Target;
-import component.Unit.Unit;
-import logic.SkillType;
+import component.Target;
+import component.Unit;
 
 public abstract class Heroes extends Unit {
     private double shield=0;
