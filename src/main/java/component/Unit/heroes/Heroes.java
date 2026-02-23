@@ -169,6 +169,4 @@ public abstract class Heroes extends Unit {
         return ultCdRemain;
     }
 
-    public void castSkill(SkillType type, Target target) {
-    }
 }

@@ -33,7 +33,7 @@ public class Archer extends Heroes {
         double totaldmg = bowStack * effectiveAtk()*0.7 + (100-getHpPercent())*0.6;
         for(Unit t:targets){
             double dmgPerUnit = totaldmg/targets.size();
-            t.takeDamage(dmgPerUnit);
+            attack(t,dmgPerUnit);
         }
         triggerUltCd();
     }
