@@ -15,14 +15,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 
 public class UpgradeScene {
+
+    private static Runnable resetCurrentSelection = null;
     public static void show(Stage stage, GameEngine gameEngine) {
 
         VBox root = new VBox();
+        root.setSpacing(70);
         root.setPadding(new Insets(10));
         root.setAlignment(Pos.TOP_CENTER);
 
@@ -43,73 +48,47 @@ public class UpgradeScene {
 
         // ===== Back button (top-left) =====
         Button backBtn = createButton("/Button/Back.png");
-        backBtn.setOnAction(e -> StartScene.showMenu(stage, gameEngine));
+        backBtn.setOnAction(e -> VictoryScene.show(stage, gameEngine));
 
         HBox topBar = new HBox(backBtn);
         topBar.setAlignment(Pos.TOP_LEFT);
 
+        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),30);
+        Text title = new Text("Dragon's  blessing");
+        title.setFont(font1);
+
         // ===== Character Select =====
         HBox charSelect = new HBox();
-        charSelect.setSpacing(30);
+        charSelect.setSpacing(60);
         charSelect.setPadding(new Insets(10));
         charSelect.setAlignment(Pos.CENTER);
-
-        ToggleGroup group = new ToggleGroup();
 
         for (Heroes h : GameEngine.getHeroTEAM()) {
 
             VBox slot = new VBox();
-            slot.setSpacing(20);
             slot.setAlignment(Pos.CENTER);
+            slot.setSpacing(20);
 
             String base = "/Heroes/" + h.getName() + "/";
+            Button charBtn = createCharacterButton(base + h.getName() + "Icon.PNG",h);
 
-            Button charBtn = createCharacterButton(
-                    base + h.getName() + "Icon.PNG",
-                    base + h.getName() + "Icon.PNG"
-            );
+            Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+            Text scale = new Text("HP :  before > after\nATK : before > after\nDEF : before > after\n");
+            scale.setFont(font2);
+            scale.setLineSpacing(8);
 
-            ToggleButton upgradeBtn = createToggleButton("Select", 170, 50);
-            upgradeBtn.setToggleGroup(group);
-
-            upgradeBtn.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-                if (isSelected) {
-                    gameEngine.setUpgradeHero(h);
-                    upgradeBtn.setText("Unselect");
-                    upgradeBtn.setStyle("""
-                        -fx-font-size: 18px;
-                        -fx-font-weight: bold;
-                        -fx-text-fill: white;
-                        -fx-background-radius: 30;
-                        -fx-background-color: linear-gradient(#ff7a18, #ffb347);
-                        -fx-cursor: hand;
-                    """);
-                } else {
-                    gameEngine.setUpgradeHero(null);
-                    upgradeBtn.setText("Select");
-                    upgradeBtn.setStyle("""
-                        -fx-font-size: 18px;
-                        -fx-font-weight: bold;
-                        -fx-text-fill: white;
-                        -fx-background-radius: 30;
-                        -fx-background-color: linear-gradient(#11998e, #38ef7d);
-                        -fx-cursor: hand;
-                    """);
-                }
-            });
-
-            slot.getChildren().addAll(charBtn, upgradeBtn);
+            slot.getChildren().addAll(charBtn,scale);
             charSelect.getChildren().add(slot);
         }
 
         // ===== Next button =====
         Button nextBtn = createButton("/Button/Next.png");
-        nextBtn.setOnMouseClicked(e -> nextBtnOnClickHandler(stage, gameEngine));
+        nextBtn.setOnMouseClicked(e -> nextBtnOnClickHandler(stage,gameEngine));
 
         VBox center = new VBox( charSelect, nextBtn);
         center.setAlignment(Pos.CENTER);
 
-        StackPane centerWrap = new StackPane(center);
+        VBox centerWrap = new VBox(title,center);
         centerWrap.setAlignment(Pos.CENTER);
         VBox.setVgrow(centerWrap, Priority.ALWAYS);
 
@@ -124,66 +103,99 @@ public class UpgradeScene {
         stage.show();
     }
 
-    private static boolean nextBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
-        if (gameEngine.getUpgradeHero() == null) {
-            Alert nullUpgrdeAlert = new Alert(Alert.AlertType.ERROR);
-            nullUpgrdeAlert.setTitle("No updated character selected");
-            nullUpgrdeAlert.setHeaderText("You are not selecting character to upgrade");
-            nullUpgrdeAlert.setContentText("You must select a character to upgrade !!!");
-            nullUpgrdeAlert.showAndWait();
-            return false;
-        } else {
-            GameEngine.upgradingHero();
-            RollElementScene.show(stage, gameEngine);
-            return true;
-        }
-    }
-
-    public static Button createCharacterButton(String imagePath1, String imagePath2) {
+    public static Button createCharacterButton(String imagePath1,Heroes hero) {
 
         DropShadow shadow = new DropShadow();
         shadow.setRadius(40);
-        shadow.setSpread(0.4);
+        shadow.setSpread(0.2);
         shadow.setOffsetX(0);
         shadow.setOffsetY(15);
         shadow.setColor(Color.rgb(0, 0, 0, 0.85));
 
+        DropShadow glow = new DropShadow();
+        glow.setRadius(40);
+        glow.setSpread(0.2);
+        glow.setOffsetX(0);
+        glow.setOffsetY(15);
+        glow.setColor(Color.WHITE);
+
         Image img1 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath1));
         ImageView iv1 = new ImageView(img1);
 
-        Image img2 = new Image(CharacterSelectionScene.class.getResourceAsStream(imagePath2));
-        ImageView iv2 = new ImageView(img2);
-
-        int[] fit = {150,150};
-        ImageView[] views = {iv1, iv2};
-        for (int i = 0; i < 2; i++) {
-            views[i].setFitWidth(fit[i]);
-            views[i].setFitHeight(fit[i]);
-            views[i].setPreserveRatio(true);
-            views[i].setSmooth(true);
-            views[i].setEffect(shadow);
-        }
+        iv1.setFitWidth(150);
+        iv1.setFitHeight(150);
+        iv1.setPreserveRatio(true);
+        iv1.setSmooth(true);
+        iv1.setEffect(shadow);
 
         Button btn = new Button();
+        btn.setAlignment(Pos.CENTER);
         btn.setStyle("-fx-background-color: transparent;");
         btn.setPrefSize(150, 150);
         btn.setMinSize(150, 150);
         btn.setMaxSize(150, 150);
 
         StackPane wrapper = new StackPane(iv1);
-        wrapper.setPrefSize(350, 350);
+        wrapper.setPrefSize(150, 150);
         btn.setGraphic(wrapper);
 
+        final boolean[] selected = {false};
+
+        Runnable animateToNormal = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        };
+
+        Runnable animateToBig = () -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), wrapper);
+            st.setToX(1.15);
+            st.setToY(1.15);
+            st.play();
+        };
+
+        Runnable resetThisButton = () -> {
+            selected[0] = false;
+            iv1.setEffect(shadow);
+            wrapper.getChildren().setAll(iv1);
+            animateToNormal.run();
+        };
+
         btn.setOnMouseEntered(e -> {
-            wrapper.getChildren().setAll(iv2);
+            if (!selected[0]) wrapper.getChildren().setAll(iv1);
             btn.setScaleX(1.05);
             btn.setScaleY(1.05);
         });
 
         btn.setOnMouseExited(e -> {
-            wrapper.getChildren().setAll(iv1);
+            if (!selected[0]) wrapper.getChildren().setAll(iv1);
             btn.setScaleX(1.0);
             btn.setScaleY(1.0);
+        });
+
+        btn.setOnMouseClicked(e -> {
+            if (!selected[0] && resetCurrentSelection != null) {
+                resetCurrentSelection.run();
+            }
+
+            selected[0] = !selected[0];
+
+            if (selected[0]) {
+                GameEngine.setUpgradeHero(hero);
+                iv1.setEffect(glow);
+                wrapper.getChildren().setAll(iv1);
+                animateToBig.run();
+                resetCurrentSelection = resetThisButton;
+            } else {
+                GameEngine.setUpgradeHero(null);
+                iv1.setEffect(shadow);
+                wrapper.getChildren().setAll(iv1);
+                resetThisButton.run();
+                if (resetCurrentSelection == resetThisButton) {
+                    resetCurrentSelection = null;
+                }
+            }
         });
 
         return btn;
@@ -241,43 +253,18 @@ public class UpgradeScene {
         return btn;
     }
 
-    private static ToggleButton createToggleButton(String text, int w, int h) {
-        ToggleButton btn = new ToggleButton(text);
-
-        btn.setPrefWidth(w);
-        btn.setPrefHeight(h);
-
-        btn.setStyle("""
-            -fx-font-size: 18px;
-            -fx-font-weight: bold;
-            -fx-text-fill: white;
-            -fx-background-radius: 30;
-            -fx-background-color: linear-gradient(#11998e, #38ef7d);
-            -fx-cursor: hand;
-        """);
-
-        btn.setOnMouseEntered(e -> {
-            btn.setScaleX(1.08);
-            btn.setScaleY(1.08);
-            btn.setOpacity(0.9);
-        });
-
-        btn.setOnMouseExited(e -> {
-            btn.setScaleX(1.0);
-            btn.setScaleY(1.0);
-            btn.setOpacity(1.0);
-        });
-
-        btn.setOnMousePressed(e -> {
-            btn.setScaleX(0.95);
-            btn.setScaleY(0.95);
-        });
-
-        btn.setOnMouseReleased(e -> {
-            btn.setScaleX(1.08);
-            btn.setScaleY(1.08);
-        });
-
-        return btn;
+    private static boolean nextBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
+        if (gameEngine.getUpgradeHero() == null) {
+            Alert nullUpgrdeAlert = new Alert(Alert.AlertType.ERROR);
+            nullUpgrdeAlert.setTitle("No updated character selected");
+            nullUpgrdeAlert.setHeaderText("You are not selecting character to upgrade");
+            nullUpgrdeAlert.setContentText("You must select a character to upgrade !!!");
+            nullUpgrdeAlert.showAndWait();
+            return false;
+        } else {
+            GameEngine.upgradingHero();
+            RollElementScene.show(stage, gameEngine);
+            return true;
+        }
     }
 }

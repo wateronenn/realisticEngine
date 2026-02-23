@@ -136,9 +136,13 @@ public class CharacterSelectionScene {
         if (gameEngine.isInTeam(hero)) {
             Image unpickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Discard.png"));
             imageView.setImage(unpickImg);
+            imageView.setFitHeight(130);
+            imageView.setPreserveRatio(true);
         } else {
             Image pickImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Button/Choose.png"));
             imageView.setImage(pickImg);
+            imageView.setFitHeight(130);
+            imageView.setPreserveRatio(true);
         }
     }
 

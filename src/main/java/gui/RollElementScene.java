@@ -33,7 +33,7 @@ public class RollElementScene {
 
         HBox root = new HBox();
         root.setPadding(new Insets(100));
-        root.setSpacing(70);
+        root.setSpacing(30);
         root.setAlignment(Pos.CENTER);
 
         // ===== Background (TOP-CENTER pinned like we did before) =====
@@ -67,7 +67,7 @@ public class RollElementScene {
 
         // ===== Monster Elements =====
         HBox monsterElementBox = new HBox();
-        monsterElementBox.setSpacing(10);
+        monsterElementBox.setSpacing(50);
         monsterElementBox.setPadding(new Insets(5));
         monsterElementBox.setAlignment(Pos.CENTER);
 
@@ -92,20 +92,44 @@ public class RollElementScene {
 
         // ===== Hero Elements =====
         HBox heroElementBox = new HBox();
-        heroElementBox.setSpacing(10);
         heroElementBox.setPadding(new Insets(5));
         heroElementBox.setAlignment(Pos.CENTER);
 
         ArrayList<Heroes> heroesTeam = GameEngine.getHeroTEAM();
         ArrayList<Element> heroElement = RandomElementGenerator.getRandomElement(heroesTeam);
 
+        int index = 0;
         for (Element e : heroElement) {
+
             Image img = RandomElementGenerator.getElementImage(e);
             ImageView imgView = new ImageView(img);
             imgView.setFitWidth(100);
             imgView.setFitHeight(100);
             imgView.setPreserveRatio(true);
-            heroElementBox.getChildren().add(imgView);
+            DropShadow shadow = new DropShadow();
+            shadow.setRadius(20);
+            shadow.setSpread(0.4);
+            shadow.setOffsetX(0);
+            shadow.setOffsetY(15);
+            shadow.setColor(Color.rgb(0, 0, 0, 0.85));
+
+            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Heroes/" + heroesTeam.get(index).getName() + "/"+ heroesTeam.get(index).getName() + "Icon.PNG"));
+            ImageView iv = new ImageView(iconImg);
+
+            iv.setFitWidth(100);
+            iv.setFitHeight(100);
+            iv.setPreserveRatio(true);
+            iv.setSmooth(true);
+            iv.setEffect(shadow);
+
+            StackPane overlay = new StackPane(imgView,iv);
+
+            StackPane.setAlignment(imgView, Pos.TOP_RIGHT);
+
+            overlay.setPrefSize(175, 175);
+
+            heroElementBox.getChildren().add(overlay);
+            index++;
         }
 
         // ===== Buttons =====
@@ -114,7 +138,7 @@ public class RollElementScene {
 
         Button startBtn = createButton("/Button/Start.png");
         startBtn.setOnAction(e -> {
-            BattleSceneTemp.show(stage,gameEngine);
+            VictoryScene.show(stage,gameEngine);
         });
 
         HBox bothBtn = new HBox(rollBtn, startBtn);
@@ -177,13 +201,38 @@ public class RollElementScene {
         ArrayList<Heroes> heroesTeam = GameEngine.getHeroTEAM();
         ArrayList<Element> heroElement = RandomElementGenerator.getRandomElement(heroesTeam);
 
+        int index = 0;
         for (Element e : heroElement) {
+
             Image img = RandomElementGenerator.getElementImage(e);
             ImageView imgView = new ImageView(img);
             imgView.setFitWidth(100);
             imgView.setFitHeight(100);
             imgView.setPreserveRatio(true);
-            heroElementBox.getChildren().add(imgView);
+            DropShadow shadow = new DropShadow();
+            shadow.setRadius(20);
+            shadow.setSpread(0.4);
+            shadow.setOffsetX(0);
+            shadow.setOffsetY(15);
+            shadow.setColor(Color.rgb(0, 0, 0, 0.85));
+
+            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Heroes/" + heroesTeam.get(index).getName() + "/"+ heroesTeam.get(index).getName() + "Icon.PNG"));
+            ImageView iv = new ImageView(iconImg);
+
+            iv.setFitWidth(100);
+            iv.setFitHeight(100);
+            iv.setPreserveRatio(true);
+            iv.setSmooth(true);
+            iv.setEffect(shadow);
+
+            StackPane overlay = new StackPane(imgView,iv);
+
+            StackPane.setAlignment(imgView, Pos.TOP_RIGHT);
+
+            overlay.setPrefSize(175, 175);
+
+            heroElementBox.getChildren().add(overlay);
+            index++;
         }
 
         int leftRoll = Math.max(0, (GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
