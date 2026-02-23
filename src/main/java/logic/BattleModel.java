@@ -1,10 +1,8 @@
 package logic;
 
-import component.Unit.Monster;
-import component.Unit.Unit;
-import component.Unit.heroes.Heroes;
+import component.Monster;
+import component.heroes.Heroes;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 

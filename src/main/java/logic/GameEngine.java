@@ -1,17 +1,15 @@
 package logic;
 
-import component.Unit.Monster;
-import component.Unit.MonsterFactory;
-import component.Unit.heroes.Heroes;
-import component.Unit.heroes.Archer;
-import component.Unit.heroes.Caster;
-import component.Unit.heroes.Fighter;
-import component.Unit.heroes.Tank;
+import component.Monster;
+import component.MonsterFactory;
+import component.heroes.Heroes;
+import component.heroes.Archer;
+import component.heroes.Caster;
+import component.heroes.Fighter;
+import component.heroes.Tank;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Collections.shuffle;
 

@@ -1,6 +1,4 @@
-package component.Unit;
-
-import component.Element;
+package component;
 
 public class Monster extends Unit {
     public Monster(int order) {

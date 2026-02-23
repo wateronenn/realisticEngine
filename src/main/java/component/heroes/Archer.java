@@ -1,8 +1,7 @@
-package component.Unit.heroes;
+package component.heroes;
 
-import component.Element;
-import component.Unit.Target;
-import component.Unit.Unit;
+import component.Target;
+import component.Unit;
 import logic.SkillType;
 
 public class Archer extends Heroes {

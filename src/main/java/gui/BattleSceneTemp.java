@@ -1,9 +1,8 @@
 package gui;
 
-import component.Unit.Monster;
-import component.Unit.heroes.Heroes;
+import component.Monster;
+import component.heroes.Heroes;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

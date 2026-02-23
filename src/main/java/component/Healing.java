@@ -1,6 +1,4 @@
-package component.Unit;
-
-import component.Unit.Unit;
+package component;
 
 public interface Healing {
     void heal(Unit target);

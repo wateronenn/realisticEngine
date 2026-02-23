@@ -1,6 +1,6 @@
 package gui;
 
-import component.Unit.heroes.Heroes;
+import component.heroes.Heroes;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
