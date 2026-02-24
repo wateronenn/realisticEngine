@@ -17,11 +17,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
 
 public class VictoryScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.VICTORY);
         VBox root = new VBox();
         root.setPadding(new Insets(133,0,0,0));
         root.setAlignment(Pos.TOP_CENTER);

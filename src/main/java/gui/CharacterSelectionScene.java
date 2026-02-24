@@ -18,6 +18,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
 
 public class CharacterSelectionScene {
 
@@ -29,7 +30,7 @@ public class CharacterSelectionScene {
     };
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.SELECT_TEAM);
         VBox root = new VBox();
         root.setPadding(new Insets(10));
         root.setSpacing(130);

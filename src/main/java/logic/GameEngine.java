@@ -18,7 +18,6 @@ public class GameEngine {
     private static final int MAX_REROLL = 3;
     public static ArrayList<Heroes> TEAM;
     public static ArrayList<Monster> MONSTER_TEAM;
-    public static ArrayList<Heroes> RANDOM_HERO;
     public static int STAGE_COUNTER = 0;
     public static List<Heroes> AllHero;
     public static Heroes upgradeHero = null;
@@ -167,13 +166,6 @@ public class GameEngine {
 
     public static void setGameState(GameState gameState) {
         GameEngine.gameState = gameState;
-    }
-
-
-    public static Heroes getRandomHero(){
-        ArrayList<Heroes> randomList = getHeroTEAM();
-        shuffle(randomList);
-        return randomList.getFirst();
     }
 
 

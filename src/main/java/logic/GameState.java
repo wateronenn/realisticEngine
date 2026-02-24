@@ -6,5 +6,6 @@ public enum GameState {
     ROLL_ELEMENT,
     BATTLE,
     VICTORY,
+    UPGRADE,
     DEFEAT
 }
