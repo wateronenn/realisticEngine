@@ -20,12 +20,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
 
 public class UpgradeScene {
 
     private static Runnable resetCurrentSelection = null;
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.UPGRADE);
         VBox root = new VBox();
         root.setSpacing(70);
         root.setPadding(new Insets(10));

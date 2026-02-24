@@ -38,7 +38,7 @@ public class BattleSceneTemp {
     private static final DropShadow HOVER_GLOW = new DropShadow(25, Color.AQUA);
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.BATTLE);
         // 1) Build battle model + engine
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
         engine = new BattleEngine(model);

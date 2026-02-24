@@ -16,12 +16,13 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
 
 public class StartScene {
 
     public static void showMenu(Stage stage,GameEngine gameEngine) {
         gameEngine.newGame();
-
+        GameEngine.setGameState(GameState.START_GAME);
         VBox root = new VBox();
 
         // ===== BACKGROUND =====
