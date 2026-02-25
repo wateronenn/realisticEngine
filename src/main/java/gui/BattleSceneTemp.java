@@ -1,78 +1,127 @@
 package gui;
 
+import component.Element;
 import component.Unit.Monster;
 import component.Unit.heroes.Heroes;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.*;
 import java.util.HashMap;
-import java.util.Map;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.Random;
 
 
 public class BattleSceneTemp {
 
-    // UI nodes we need to update
-    private static HBox heroBox;
-    private static HBox monsterBox;
+    private static Pane heroBox;
+    private static Pane monsterBox;
     private static Label logLabel;
     private static Button normalBtn, skillBtn, ultBtn;
     private static Label stageLabel;
 
-    // keep references
     private static BattleEngine engine;
     private static BattleModel model;
+
     private static final Map<Heroes, Region> heroCardMap = new HashMap<>();
     private static final Map<Monster, Region> monsterCardMap = new HashMap<>();
-    private static final DropShadow TURN_GLOW = new DropShadow(35, Color.GOLD);
+
+    private static final DropShadow TURN_GLOW  = new DropShadow(35, Color.GOLD);
     private static final DropShadow HOVER_GLOW = new DropShadow(25, Color.AQUA);
+
+    private static String[] monsterType = new String[3];
 
     public static void show(Stage stage, GameEngine gameEngine) {
 
-        // 1) Build battle model + engine
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
         engine = new BattleEngine(model);
+        for (int i = 0; i < 3; i++) {
+            Random rand = new Random();
+            int number = rand.nextInt(3);
+            monsterType[i] = "Type" + (number + 1);
+        }
 
-        // 2) Build UI layout
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(20));
+        AnchorPane root = new AnchorPane();
+        root.setPadding(new Insets(10));
 
-        // Monsters (top)
-        monsterBox = new HBox(20);
-        monsterBox.setAlignment(Pos.CENTER);
-        root.setTop(monsterBox);
+        // ===== Background =====
+        Random rand = new Random();
+        int number = rand.nextInt(3);
+        Image bg = new Image(application.Main.class.getResource("/Background/BattleStage" + (number + 1) + ".png").toExternalForm());
+        BackgroundImage bgImage = new BackgroundImage(
+                bg,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(
+                        100, 100, true, true, true, true // IMPORTANT: scale background
+                )
+        );
+        root.setBackground(new Background(bgImage));
 
-        // Heroes (bottom)
-        heroBox = new HBox(20);
-        heroBox.setAlignment(Pos.CENTER);
-        root.setBottom(heroBox);
+        // ===== HERO BOX (LEFT) =====
+        heroBox = new Pane();
+        heroBox.setStyle("""
+            -fx-border-color: white;
+            -fx-border-width: 3;
+        """);
 
-        // Center controls
-        VBox center = new VBox(10);
-        center.setAlignment(Pos.CENTER);
+        // left + vertically around middle-lower area
+        AnchorPane.setLeftAnchor(heroBox, 200.0);
+        AnchorPane.setTopAnchor(heroBox, 140.0);
+
+        // ===== MONSTER BOX (RIGHT) =====
+        monsterBox = new Pane();
+        monsterBox.setStyle("""
+            -fx-border-color: white;
+            -fx-border-width: 3;
+        """);
+
+        AnchorPane.setRightAnchor(monsterBox, 200.0);
+        AnchorPane.setTopAnchor(monsterBox, 140.0);
+
+        // ===== CENTER CONTROLS (BOTTOM CENTER) =====
+        VBox controls = new VBox(10);
+        controls.setAlignment(Pos.CENTER);
 
         stageLabel = new Label("Stage: " + engine.getBattleStage());
+        stageLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;");
+
         logLabel = new Label("Battle Start! Choose Hero skill");
+        logLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+
         normalBtn = new Button("Normal");
         skillBtn  = new Button("Skill");
         ultBtn    = new Button("Ultimate");
 
+        styleButton(normalBtn);
+        styleButton(skillBtn);
+        styleButton(ultBtn);
+
         HBox skillBar = new HBox(10, normalBtn, skillBtn, ultBtn);
         skillBar.setAlignment(Pos.CENTER);
 
-        center.getChildren().addAll(stageLabel,logLabel, skillBar);
-        root.setCenter(center);
+        controls.getChildren().addAll(stageLabel, logLabel, skillBar);
+
+        // Anchor controls bottom center (stretch full width so it's centered)
+        AnchorPane.setLeftAnchor(controls, 0.0);
+        AnchorPane.setRightAnchor(controls, 0.0);
+        AnchorPane.setBottomAnchor(controls, 20.0);
+
+        // Add nodes
+        root.getChildren().addAll(heroBox, monsterBox,controls);
 
         // 3) Wire buttons to engine
         normalBtn.setOnAction(e -> engine.onClickHeroSkill(SkillType.NORMAL_ATTACK));
@@ -83,10 +132,9 @@ public class BattleSceneTemp {
         engine.setListener(new BattleListener() {
             @Override
             public void onStateChanged(BattleStage stage) {
-                stageLabel.setText(stage.toString());
+                stageLabel.setText("Stage: " + stage);
                 refreshInteractivity(stage);
                 refreshTurnGlow();
-
             }
 
             @Override
@@ -123,12 +171,25 @@ public class BattleSceneTemp {
 
         List<Heroes> heroes = model.getHERO_TEAM();
         List<Monster> monsters = model.getMONSTER_TEAM();
+        int[][] HeroesCardPos = {{0,165,0},
+                {0,100,200}
+        };
+        int[][] MonstersCardPos = {{165,0,165},
+                {0,100,200}
+        };
 
         // HERO cards (also used for ally-target selection)
-        for (Heroes h : heroes) {
-            VBox card = unitCard(h.getName(), h.getHp(), h.isDead());
+        for (int i = 0; i < heroes.size(); i++) {
+            Heroes h = heroes.get(i);
+
+            VBox card = unitCard(h.getName(), h.getHp(), h.isDead(), h.getElement(), true);
+
+            // ===== POSITION (OVERLAP) =====
+            card.setLayoutX(HeroesCardPos[0][i]);   // small horizontal shift
+            card.setLayoutY(HeroesCardPos[1][i]);   // vertical shift (stack look)
 
             setupHoverGlow(card, () -> engine.getBattleStage() == BattleStage.HERO_CHOOSE_ALLY);
+
             card.setOnMouseClicked(e -> {
                 if (engine.getBattleStage() == BattleStage.HERO_CHOOSE_ALLY && !h.isDead()) {
                     engine.onClickChoosingAlly(h);
@@ -142,11 +203,17 @@ public class BattleSceneTemp {
         // MONSTER cards (index matters for choosing target)
         for (int i = 0; i < monsters.size(); i++) {
             Monster m = monsters.get(i);
-            VBox card = unitCard(m.getName(), m.getHp(), m.isDead());
+
+            VBox card = unitCard(monsterType[i], m.getHp(), m.isDead(), m.getElement(), false);
 
             final int idx = i;
 
+            // ===== POSITION (REVERSE STACK) =====
+            card.setLayoutX(MonstersCardPos[0][i]);   // small horizontal shift
+            card.setLayoutY(MonstersCardPos[1][i]);   // vertical shift (stack look)
+
             setupHoverGlow(card, () -> engine.getBattleStage() == BattleStage.HERO_CHOOSE_TARGET);
+
             card.setOnMouseClicked(e -> {
                 if (engine.getBattleStage() == BattleStage.HERO_CHOOSE_TARGET && !m.isDead()) {
                     engine.onClickChoosingTarget(idx);
@@ -158,29 +225,39 @@ public class BattleSceneTemp {
         }
     }
 
-    private static VBox unitCard(String name, double hp, boolean dead) {
-        Label n = new Label(name);
-        Label h = new Label("HP: " + hp);
+    private static VBox unitCard(String name, double hp, boolean dead, Element e,boolean isHero) {
 
-        VBox box = new VBox(6, n, h);
-        box.setPadding(new Insets(12));
+        // ===== IMAGE =====
+        String path;
+        if(isHero) {
+            path = "/Heroes/" + name + "/" + name + "Still.PNG";
+        }
+        else{
+            path = "/Monster/" + name + "/" + e + "/Norm.png";
+        }
+        Image img = new Image(BattleScene.class.getResourceAsStream(path));
+        ImageView iv = new ImageView(img);
+        iv.setFitWidth(220);
+        iv.setFitHeight(220);
+        iv.setPreserveRatio(true);
+
+        Label h = new Label("HP: " + (int) hp);
+        h.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+
+        // ===== LAYOUT =====
+        VBox box = new VBox(h,iv);
         box.setAlignment(Pos.CENTER);
-        box.setMinWidth(140);
+        box.setPadding(new Insets(10));
 
         box.setStyle("""
-        -fx-border-color: rgba(255,255,255,0.7);
-        -fx-border-radius: 12;
-        -fx-background-radius: 12;
-        -fx-background-color: rgba(0,0,0,0.35);
-    """);
+                -fx-border-color: white;
+                -fx-border-width: 3;
+                """);
+        box.setOpacity(dead ? 0.35 : 1.0);
 
-        if (dead) {
-            box.setOpacity(0.35);
-        } else {
-            box.setOpacity(1.0);
-        }
         return box;
     }
+
     private static void setupHoverGlow(Region node, BooleanSupplier canHover) {
         node.setOnMouseEntered(e -> {
             if (canHover.getAsBoolean() && node.getOpacity() > 0.5) {
@@ -188,25 +265,29 @@ public class BattleSceneTemp {
             }
         });
         node.setOnMouseExited(e -> {
-            // don't remove turn glow here; refreshTurnGlow() will restore it
             node.setEffect(null);
-            refreshTurnGlow();
+            refreshTurnGlow(); // restore turn glow if needed
         });
     }
 
-
     private static void refreshButtons() {
-        Heroes active = engine.getModel().getHERO_TEAM().get(engine.getModel().getActiveHeroIndex());
+        // If model not ready yet, skip
+        Heroes active = safeGetActiveHero();
+        if (active == null) return;
 
-        // Enable/disable based on cooldown
-        // adapt names to your hero API:
-        skillBtn.setDisable(engine.getBattleStage() == BattleStage.MONSTER_TURN);
-        skillBtn.setDisable(!active.canUseSkill());
-        ultBtn.setDisable(!active.canUseUlt());
-
-        // Normal usually always enabled:
+        // Default: enable all; then apply stage/cooldown rules
         normalBtn.setDisable(false);
+
+        // Cooldown rules (only matters during hero choose skill stage)
+        if (engine.getBattleStage() == BattleStage.HERO_CHOOSE_SKILL) {
+            skillBtn.setDisable(!active.canUseSkill());
+            ultBtn.setDisable(!active.canUseUlt());
+        } else {
+            // outside hero choose skill, interactivity function will control them
+            // (keep as-is)
+        }
     }
+
     private static void refreshTurnGlow() {
         // clear all effects first (then reapply turn glow if needed)
         for (Region r : heroCardMap.values()) r.setEffect(null);
@@ -236,37 +317,39 @@ public class BattleSceneTemp {
         if (idx < 0 || idx >= model.getHERO_TEAM().size()) return null;
         return model.getHERO_TEAM().get(idx);
     }
+
     private static void refreshInteractivity(BattleStage stage) {
-        // Skills clickable only in HERO_CHOOSE_SKILL
-        boolean canClickSkills = (stage == BattleStage.HERO_CHOOSE_SKILL);
-        normalBtn.setDisable(!canClickSkills);
-        // skill/ult will be further disabled by cooldown in refreshButtons()
-        if (canClickSkills) refreshButtons();
-        else {
-            skillBtn.setDisable(true);
-            ultBtn.setDisable(true);
+
+        if (stage == BattleStage.HERO_CHOOSE_SKILL) {
+            setHeroInputEnabled(true);
+            logLabel.setText("Choose Hero skill");
+            refreshButtons();
+            heroBox.setDisable(false);
+            monsterBox.setDisable(false);
         }
 
-        // You can also highlight targets here if you want:
-        if (stage == BattleStage.HERO_CHOOSE_TARGET) {
+        else if (stage == BattleStage.HERO_CHOOSE_TARGET) {
             logLabel.setText("Choose a monster target");
             normalBtn.setDisable(true);
             skillBtn.setDisable(true);
             ultBtn.setDisable(true);
 
-            heroBox.setDisable(true);      // optional
+            heroBox.setDisable(true);
             monsterBox.setDisable(false);
-        } else if (stage == BattleStage.HERO_CHOOSE_ALLY) {
+        }
+
+        else if (stage == BattleStage.HERO_CHOOSE_ALLY) {
             logLabel.setText("Choose an ally target");
             normalBtn.setDisable(true);
             skillBtn.setDisable(true);
             ultBtn.setDisable(true);
 
-            heroBox.setDisable(false);     // allow ally selection
+            heroBox.setDisable(false);
             monsterBox.setDisable(true);
-        } else if (stage == BattleStage.MONSTER_TURN) {
+        }
+
+        else if (stage == BattleStage.MONSTER_TURN) {
             logLabel.setText("Monster turn... (Wait 2 second)");
-            System.out.println("Monster turn");
             setHeroInputEnabled(false);
 
             PauseTransition p = new PauseTransition(Duration.millis(2000));
@@ -275,18 +358,19 @@ public class BattleSceneTemp {
                 engine.executeMonsterTurnAndContinue();
             });
             p.play();
+        }
 
-        }
-        else if (stage == BattleStage.HERO_CHOOSE_SKILL) {
-            setHeroInputEnabled(true);
-            logLabel.setText("Chooseeeeeeeeee Hero skill");
-        }
         else if (stage == BattleStage.WIN_TURN) {
+            setHeroInputEnabled(false);
             logLabel.setText("Victory!");
-        } else if (stage == BattleStage.LOSE_TURN) {
+        }
+
+        else if (stage == BattleStage.LOSE_TURN) {
+            setHeroInputEnabled(false);
             logLabel.setText("Defeat!");
         }
     }
+
     private static void setHeroInputEnabled(boolean enabled) {
         normalBtn.setDisable(!enabled);
         skillBtn.setDisable(!enabled);
@@ -295,5 +379,26 @@ public class BattleSceneTemp {
         // Optional: disable clicking on units too
         heroBox.setDisable(!enabled);
         monsterBox.setDisable(!enabled);
+    }
+
+    private static void styleButton(Button btn) {
+        btn.setStyle("""
+            -fx-background-color: linear-gradient(#ff7a18, #ffb347);
+            -fx-text-fill: white;
+            -fx-font-weight: bold;
+            -fx-font-size: 14px;
+            -fx-background-radius: 18;
+            -fx-padding: 10 18;
+        """);
+
+        btn.setOnMouseEntered(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1);
+            btn.setScaleY(1);
+        });
     }
 }
