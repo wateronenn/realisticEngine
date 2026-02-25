@@ -1,8 +1,8 @@
 package gui;
 
 import component.Element;
-import component.Unit.Monster;
-import component.Unit.heroes.Heroes;
+import component.Monster;
+import component.heroes.Heroes;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
+import logic.GameState;
 import logic.RandomElementGenerator;
 
 import java.util.ArrayList;
@@ -27,10 +28,9 @@ import java.util.ArrayList;
 public class RollElementScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
         GameEngine.addStageCounter(1);
         GameEngine.setCountReroll(0);
-
+        GameEngine.setGameState(GameState.ROLL_ELEMENT);
         HBox root = new HBox();
         root.setPadding(new Insets(100));
         root.setSpacing(30);

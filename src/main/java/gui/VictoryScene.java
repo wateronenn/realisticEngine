@@ -1,14 +1,12 @@
 package gui;
 
-import component.Unit.heroes.Heroes;
+import component.heroes.Heroes;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,7 +22,7 @@ import logic.GameState;
 public class VictoryScene {
 
     public static void show(Stage stage, GameEngine gameEngine) {
-
+        GameEngine.setGameState(GameState.VICTORY);
         VBox root = new VBox();
         root.setPadding(new Insets(133,0,0,0));
         root.setAlignment(Pos.TOP_CENTER);

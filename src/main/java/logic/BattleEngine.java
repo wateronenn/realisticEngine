@@ -1,9 +1,8 @@
 package logic;
 
-import component.Unit.Monster;
-import component.Unit.Target;
-import component.Unit.Unit;
-import component.Unit.heroes.Heroes;
+import component.Monster;
+import component.Target;
+import component.heroes.Heroes;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +13,7 @@ public class BattleEngine {
     private BattleModel model = null;
     private BattleStage stage;
     private BattleListener listener;
-    private int turnCounter = 0;
+    private int turnCounter = 1;
 
     public BattleEngine(BattleModel model){
         this.model = model;
@@ -25,6 +24,7 @@ public class BattleEngine {
             setBattleStage(BattleStage.LOSE_TURN);
             GameEngine.setGameState(GameState.DEFEAT);
         }
+        setTurnCounter(1);
     }
     public void setListener(BattleListener listener){
         this.listener = listener;
@@ -199,6 +199,8 @@ public class BattleEngine {
 
         tickCooldownsForHeroes();
         model.setActiveHeroIndex(findNextAliveHeroIndex(-1));
+        int turn = getTurnCounter();
+        setTurnCounter(turn+1);
         setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
         emitState(stage);
         emitUpdate();

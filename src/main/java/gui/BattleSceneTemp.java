@@ -45,6 +45,8 @@ public class BattleSceneTemp {
 
     public static void show(Stage stage, GameEngine gameEngine) {
 
+        GameEngine.setGameState(GameState.BATTLE);
+        // 1) Build battle model + engine
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
         engine = new BattleEngine(model);
         for (int i = 0; i < 3; i++) {

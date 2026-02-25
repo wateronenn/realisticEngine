@@ -1,10 +1,9 @@
 package logic;
 
 import component.Element;
-import component.Unit.Unit;
+import component.Unit;
 import javafx.scene.image.Image;
 
-import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;

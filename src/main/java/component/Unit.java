@@ -1,7 +1,5 @@
-package component.Unit;
+package component;
 
-import component.Element;
-import logic.BattleEngine;
 import logic.SkillType;
 
 
