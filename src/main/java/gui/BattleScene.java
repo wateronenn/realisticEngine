@@ -28,15 +28,29 @@ import java.util.function.BooleanSupplier;
 
 public class BattleScene {
 
+    // ======================= NODES =======================
     private static Pane heroBox;
     private static Pane monsterBox;
+    // TOP CORNER BACKGROUND PANELS
+    private static StackPane heroElementPanelTopLeft;
+    private static StackPane monsterElementPanelTopRight;
+
     private static Label logLabel;
-    private static Button normalBtn, skillBtn, ultBtn;
     private static Label stageLabel;
 
+    private static Button normalBtn, skillBtn, ultBtn;
+
+    // TOP CORNER ELEMENT ICONS
+    private static HBox heroElementBoxTopLeft;
+    private static HBox monsterElementBoxTopRight;
+    private static final Map<Heroes, ImageView> heroElementIconMap = new HashMap<>();
+    private static final Map<Monster, ImageView> monsterElementIconMap = new HashMap<>();
+
+    // ======================= ENGINE / MODEL =======================
     private static BattleEngine engine;
     private static BattleModel model;
 
+    // ======================= UI MAPS =======================
     private static final Map<Heroes, Region> heroCardMap = new HashMap<>();
     private static final Map<Monster, Region> monsterCardMap = new HashMap<>();
 
@@ -49,17 +63,21 @@ public class BattleScene {
     // per-hero timer (attack image back to idle)
     private static final Map<Heroes, Animation> heroTempAnimMap = new HashMap<>();
 
-    // turn tracking
+    // ======================= TURN TRACKING =======================
     private static BattleStage lastStage = null;
-    private static Heroes lastActiveHero = null;     // active hero at last stage
-    private static Heroes heroBeforeMonsterTurn = null; // the hero who ended hero phase (last hero)
+    private static Heroes lastActiveHero = null;          // active hero at last stage
+    private static Heroes heroBeforeMonsterTurn = null;   // the hero who ended hero phase (last hero)
 
+    // ======================= EFFECTS =======================
     private static final DropShadow TURN_GLOW  = new DropShadow(35, Color.GOLD);
     private static final DropShadow HOVER_GLOW = new DropShadow(25, Color.AQUA);
 
+    // ======================= DATA =======================
     private static final String[] monsterType = new String[3];
 
-    // ======================= HP BAR UI =======================
+    // =============================================================
+    //                         HP BAR UI
+    // =============================================================
     private static class HpBarUI {
         final double barW = 250;
         final double barH = 20;
@@ -78,7 +96,6 @@ public class BattleScene {
             this.maxHp = Math.max(1, maxHp);
             this.currentHp = currentHp;
 
-
             bg.setFill(Color.rgb(0, 0, 0, 0.40));
 
             border.setFill(Color.TRANSPARENT);
@@ -96,11 +113,6 @@ public class BattleScene {
             """);
 
             setInstant(currentHp);
-        }
-
-        private void round(Rectangle r) {
-            r.setArcWidth(18);
-            r.setArcHeight(18);
         }
 
         StackPane node() {
@@ -156,6 +168,7 @@ public class BattleScene {
                                 new KeyValue(dmg.widthProperty(), barW * newRatio, Interpolator.EASE_OUT)
                         )
                 );
+
                 PauseTransition delay = new PauseTransition(Duration.millis(120));
                 delay.setOnFinished(e -> lag.play());
                 delay.play();
@@ -177,7 +190,9 @@ public class BattleScene {
         }
     }
 
-    // ======================= HIT SHAKE =======================
+    // =============================================================
+    //                        ANIMATIONS
+    // =============================================================
     private static void playHitAnimation(Region card) {
         TranslateTransition shake = new TranslateTransition(Duration.millis(60), card);
         shake.setByX(10);
@@ -186,7 +201,9 @@ public class BattleScene {
         shake.play();
     }
 
-    // ======================= IMAGE HELPERS =======================
+    // =============================================================
+    //                      IMAGE HELPERS
+    // =============================================================
     private static Image loadImageSafe(String path, String fallbackPath) {
         try {
             var s = BattleScene.class.getResourceAsStream(path);
@@ -217,14 +234,13 @@ public class BattleScene {
         );
     }
 
-    // Show Attack.PNG for 1.5s then back to Still.PNG
+    // Show Attack.PNG for 1.0s then back to Still.PNG
     private static void showAttackFor1_5s(Heroes h) {
         if (h == null || h.isDead()) return;
 
         ImageView iv = heroImageMap.get(h);
         if (iv == null) return;
 
-        // cancel old timer
         Animation old = heroTempAnimMap.get(h);
         if (old != null) old.stop();
 
@@ -240,6 +256,202 @@ public class BattleScene {
         back.play();
     }
 
+    // =============================================================
+    //                    TOP CORNER ELEMENT ICONS
+    // =============================================================
+    private static ImageView makeElementIcon(Image img) {
+        ImageView iv = new ImageView(img);
+        iv.setFitWidth(60);
+        iv.setFitHeight(60);
+        iv.setPreserveRatio(true);
+        iv.setSmooth(true);
+
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(15);
+        shadow.setSpread(0.25);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(8);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.70));
+        iv.setEffect(shadow);
+
+        return iv;
+    }
+
+    private static void initTopCornerElementUI(AnchorPane root) {
+
+        heroElementBoxTopLeft = new HBox(12);
+        heroElementBoxTopLeft.setPadding(new Insets(5));
+        heroElementBoxTopLeft.setAlignment(Pos.CENTER_LEFT);
+
+        monsterElementBoxTopRight = new HBox(12);
+        monsterElementBoxTopRight.setPadding(new Insets(5));
+        monsterElementBoxTopRight.setAlignment(Pos.CENTER_RIGHT);
+
+        // --- Background panels ---
+        heroElementPanelTopLeft = new StackPane(heroElementBoxTopLeft);
+        heroElementPanelTopLeft.setAlignment(Pos.CENTER_LEFT);
+        heroElementPanelTopLeft.setPadding(new Insets(6));
+
+        monsterElementPanelTopRight = new StackPane(monsterElementBoxTopRight);
+        monsterElementPanelTopRight.setAlignment(Pos.CENTER_RIGHT);
+        monsterElementPanelTopRight.setPadding(new Insets(6));
+
+        // Build overlays (element + unit image) once
+        rebuildTopCornerElementIcons();
+
+        // Pin panels to corners
+        AnchorPane.setTopAnchor(heroElementPanelTopLeft, 12.0);
+        AnchorPane.setLeftAnchor(heroElementPanelTopLeft, 12.0);
+
+        AnchorPane.setTopAnchor(monsterElementPanelTopRight, 12.0);
+        AnchorPane.setRightAnchor(monsterElementPanelTopRight, 12.0);
+
+        root.getChildren().addAll(heroElementPanelTopLeft, monsterElementPanelTopRight);
+    }
+
+    private static void rebuildTopCornerElementIcons() {
+
+        if (heroElementBoxTopLeft != null) heroElementBoxTopLeft.getChildren().clear();
+        if (monsterElementBoxTopRight != null) monsterElementBoxTopRight.getChildren().clear();
+
+        heroElementIconMap.clear();
+        monsterElementIconMap.clear();
+
+        if (model == null) return;
+
+        // HERO: element + HERO ICON overlay (like your old code)
+        List<Heroes> heroes = model.getHERO_TEAM();
+        for (int i = 0; i < heroes.size(); i++) {
+            Heroes h = heroes.get(i);
+
+            StackPane overlay = buildHeroElementOverlay(h);
+            heroElementBoxTopLeft.getChildren().add(overlay);
+        }
+
+        // MONSTER: element + Norm.png overlay
+        List<Monster> monsters = model.getMONSTER_TEAM();
+        for (int i = 0; i < monsters.size(); i++) {
+            Monster m = monsters.get(i);
+
+            StackPane overlay = buildMonsterElementOverlay(m, i);
+            monsterElementBoxTopRight.getChildren().add(overlay);
+        }
+    }
+
+    private static StackPane buildHeroElementOverlay(Heroes hero) {
+
+        // Element icon
+        Image elementImg = RandomElementGenerator.getElementImage(hero.getElement());
+        ImageView elementView = new ImageView(elementImg);
+        elementView.setFitWidth(60);
+        elementView.setFitHeight(60);
+        elementView.setPreserveRatio(true);
+
+        // Hero icon (same as your old path)
+        String name = hero.getName();
+        Image heroIcon = loadImageSafe(
+                "/Heroes/" + name + "/" + name + "Icon.PNG",
+                "/Heroes/" + name + "/" + name + "Still.PNG"
+        );
+        ImageView heroView = new ImageView(heroIcon);
+        heroView.setFitWidth(60);
+        heroView.setFitHeight(60);
+        heroView.setPreserveRatio(true);
+        heroView.setSmooth(true);
+
+        // Shadow
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(18);
+        shadow.setSpread(0.35);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(10);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.80));
+        heroView.setEffect(shadow);
+
+        // Background
+        Image iconImg = new Image(BattleScene.class.getResourceAsStream("/Sign/ElementSlot.png"));
+        ImageView iv = new ImageView(iconImg);
+        iv.setFitWidth(100);
+        iv.setFitHeight(100);
+
+        // Overlay
+        StackPane overlay = new StackPane(iv,elementView, heroView);
+        StackPane.setAlignment(elementView, Pos.TOP_RIGHT);
+        StackPane.setMargin(elementView,new Insets(10));
+        StackPane.setAlignment(heroView,Pos.BOTTOM_LEFT);
+        StackPane.setMargin(heroView,new Insets(12));
+        overlay.setPrefSize(100, 100);
+
+
+        return overlay;
+    }
+
+    private static StackPane buildMonsterElementOverlay(Monster m, int index) {
+
+        // Element icon
+        Image elementImg = RandomElementGenerator.getElementImage(m.getElement());
+        ImageView elementView = new ImageView(elementImg);
+        elementView.setFitWidth(60);
+        elementView.setFitHeight(60);
+        elementView.setPreserveRatio(true);
+
+        // Monster Norm.png path using your monsterType[]
+        String type = monsterType[index];
+        String normPath = "/Monster/" + type + "/" + m.getElement() + "/Norm.png";
+        Image monsterImg = loadImageSafe(normPath, normPath);
+
+        ImageView monsterView = new ImageView(monsterImg);
+        monsterView.setFitWidth(75);
+        monsterView.setFitHeight(75);
+        monsterView.setPreserveRatio(true);
+        monsterView.setSmooth(true);
+
+        // Shadow
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(18);
+        shadow.setSpread(0.35);
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(10);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.80));
+        monsterView.setEffect(shadow);
+
+        // Background
+        Image iconImg = new Image(BattleScene.class.getResourceAsStream("/Sign/ElementSlot.png"));
+        ImageView iv = new ImageView(iconImg);
+        iv.setFitWidth(100);
+        iv.setFitHeight(100);
+
+        // Overlay
+        StackPane overlay = new StackPane(iv,elementView, monsterView);
+        StackPane.setAlignment(elementView, Pos.TOP_RIGHT);
+        StackPane.setMargin(elementView,new Insets(12));
+        StackPane.setAlignment(monsterView,Pos.TOP_LEFT);
+        StackPane.setAlignment(iv,Pos.CENTER);
+        overlay.setPrefSize(100, 100);
+
+        monsterElementIconMap.put(m, elementView);
+
+        return overlay;
+    }
+
+    // Optional: if elements can change mid battle, call this to refresh images
+    private static void refreshTopCornerElementIcons() {
+        if (model == null) return;
+
+        for (Heroes h : model.getHERO_TEAM()) {
+            ImageView iv = heroElementIconMap.get(h);
+            if (iv != null) iv.setImage(RandomElementGenerator.getElementImage(h.getElement()));
+        }
+
+        for (Monster m : model.getMONSTER_TEAM()) {
+            ImageView iv = monsterElementIconMap.get(m);
+            if (iv != null) iv.setImage(RandomElementGenerator.getElementImage(m.getElement()));
+        }
+    }
+
+    // =============================================================
+    //                       TURN HELPERS
+    // =============================================================
     private static boolean isHeroDecisionStage(BattleStage s) {
         return s == BattleStage.HERO_CHOOSE_SKILL
                 || s == BattleStage.HERO_CHOOSE_TARGET
@@ -269,13 +481,12 @@ public class BattleScene {
 
         // track who is the "last hero" right before monster turn
         if (isHeroDecisionStage(lastStage)) {
-            heroBeforeMonsterTurn = lastActiveHero; // keep updating during hero phase
+            heroBeforeMonsterTurn = lastActiveHero;
         }
 
-        // (1) HERO -> HERO end turn (active hero changed while still in hero phase)
+        // (1) HERO -> HERO end turn
         boolean heroPhaseToHeroPhase = isHeroDecisionStage(lastStage) && isHeroDecisionStage(currentStage);
         if (heroPhaseToHeroPhase && currentActive != null && lastActiveHero != null && currentActive != lastActiveHero) {
-            // lastActiveHero just ended his turn
             showAttackFor1_5s(lastActiveHero);
         }
 
@@ -285,12 +496,13 @@ public class BattleScene {
             showAttackFor1_5s(heroBeforeMonsterTurn);
         }
 
-        // update trackers
         lastStage = currentStage;
         lastActiveHero = currentActive;
     }
 
-    // ======================= MAIN =======================
+    // =============================================================
+    //                           MAIN
+    // =============================================================
     public static void show(Stage stage, GameEngine gameEngine) {
 
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
@@ -304,7 +516,10 @@ public class BattleScene {
 
         // Background
         int number = rand.nextInt(3) + 1;
-        Image bg = new Image(application.Main.class.getResource("/Background/BattleStage" + number + ".png").toExternalForm());
+        Image bg = new Image(application.Main.class
+                .getResource("/Background/BattleStage" + number + ".png")
+                .toExternalForm()
+        );
         root.setBackground(new Background(new BackgroundImage(
                 bg,
                 BackgroundRepeat.NO_REPEAT,
@@ -313,15 +528,18 @@ public class BattleScene {
                 new BackgroundSize(100, 100, true, true, true, true)
         )));
 
+        // TOP CORNER ELEMENTS (NEW)
+        initTopCornerElementUI(root);
+
         // HERO BOX (LEFT)
         heroBox = new Pane();
         AnchorPane.setLeftAnchor(heroBox, 150.0);
-        AnchorPane.setTopAnchor(heroBox, 140.0);
+        AnchorPane.setTopAnchor(heroBox, 120.0);
 
         // MONSTER BOX (RIGHT)
         monsterBox = new Pane();
         AnchorPane.setRightAnchor(monsterBox, 150.0);
-        AnchorPane.setTopAnchor(monsterBox, 140.0);
+        AnchorPane.setTopAnchor(monsterBox, 120.0);
 
         // CONTROLS
         VBox controls = new VBox(10);
@@ -350,10 +568,10 @@ public class BattleScene {
 
         root.getChildren().addAll(heroBox, monsterBox, controls);
 
-        // Buttons (optional: you can keep or remove this; end-turn image still works either way)
+        // Buttons
         normalBtn.setOnAction(e -> engine.onClickHeroSkill(SkillType.NORMAL_ATTACK));
-        skillBtn.setOnAction(e -> engine.onClickHeroSkill(SkillType.SKILL));
-        ultBtn.setOnAction(e -> engine.onClickHeroSkill(SkillType.ULTIMATE));
+        skillBtn  .setOnAction(e -> engine.onClickHeroSkill(SkillType.SKILL));
+        ultBtn    .setOnAction(e -> engine.onClickHeroSkill(SkillType.ULTIMATE));
 
         engine.setListener(new BattleListener() {
             @Override
@@ -362,8 +580,6 @@ public class BattleScene {
                     stageLabel.setText("Stage: " + stage);
                     refreshInteractivity(stage);
                     refreshTurnGlow();
-
-                    // ✅ end-turn attack image logic (hero->hero + last hero)
                     handleEndTurnAttackImage(stage);
                 });
             }
@@ -379,7 +595,9 @@ public class BattleScene {
                     updateUnitsAnimated();
                     refreshButtons();
                     refreshTurnGlow();
-                    // Do NOT call handleEndTurnAttackImage here (avoid late/wrong triggers)
+
+                    // keep top corner elements in sync (NEW)
+                    refreshTopCornerElementIcons();
                 });
             }
         });
@@ -399,17 +617,23 @@ public class BattleScene {
         stage.show();
     }
 
-    // ======================= BUILD UNITS ONCE =======================
+    // =============================================================
+    //                    BUILD UNITS (ONCE)
+    // =============================================================
     private static void buildUnits() {
+
         heroBox.getChildren().clear();
         monsterBox.getChildren().clear();
 
         heroCardMap.clear();
         monsterCardMap.clear();
+
         heroHpMap.clear();
         monsterHpMap.clear();
+
         heroImageMap.clear();
         monsterImageMap.clear();
+
         heroTempAnimMap.clear();
 
         List<Heroes> heroes = model.getHERO_TEAM();
@@ -423,7 +647,6 @@ public class BattleScene {
             Heroes h = heroes.get(i);
 
             VBox card = unitCardWithHpBar_Hero(h.getHp(), h.isDead(), h);
-
             card.setLayoutX(HeroesCardPos[0][i]);
             card.setLayoutY(HeroesCardPos[1][i]);
 
@@ -461,8 +684,11 @@ public class BattleScene {
         }
     }
 
-    // ======================= UPDATE HP (NO REBUILD) =======================
+    // =============================================================
+    //                 UPDATE HP (NO REBUILD)
+    // =============================================================
     private static void updateUnitsAnimated() {
+
         for (Heroes h : model.getHERO_TEAM()) {
             HpBarUI ui = heroHpMap.get(h);
             Region card = heroCardMap.get(h);
@@ -492,47 +718,59 @@ public class BattleScene {
         }
     }
 
-    // ======================= CARD BUILDERS =======================
+    // =============================================================
+    //                       CARD BUILDERS
+    // =============================================================
     private static VBox unitCardWithHpBar_Hero(double hp, boolean dead, Heroes heroRef) {
+
         ImageView iv = new ImageView(heroIdleImg(heroRef));
         iv.setFitWidth(220);
         iv.setFitHeight(220);
         iv.setPreserveRatio(true);
+
         heroImageMap.put(heroRef, iv);
 
-        HpBarUI hpUI = new HpBarUI(hp, hp); // if you have getMaxHp(): new HpBarUI(heroRef.getMaxHp(), hp)
+        HpBarUI hpUI = new HpBarUI(hp, hp);
         heroHpMap.put(heroRef, hpUI);
 
         VBox box = new VBox(8, hpUI.node(), iv);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(10));
         box.setOpacity(dead ? 0.35 : 1.0);
+
         return box;
     }
 
     private static VBox unitCardWithHpBar_Monster(String typeName, double hp, boolean dead, Element e, Monster monsterRef) {
+
         String idlePath = "/Monster/" + typeName + "/" + e + "/Norm.png";
+
         ImageView iv = new ImageView(loadImageSafe(idlePath, idlePath));
         iv.setFitWidth(220);
         iv.setFitHeight(220);
         iv.setPreserveRatio(true);
+
         monsterImageMap.put(monsterRef, iv);
 
-        HpBarUI hpUI = new HpBarUI(hp, hp); // if you have getMaxHp(): new HpBarUI(monsterRef.getMaxHp(), hp)
+        HpBarUI hpUI = new HpBarUI(hp, hp);
         monsterHpMap.put(monsterRef, hpUI);
 
         VBox box = new VBox(8, hpUI.node(), iv);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(10));
         box.setOpacity(dead ? 0.35 : 1.0);
+
         return box;
     }
 
-    // ======================= UI HELPERS =======================
+    // =============================================================
+    //                         UI HELPERS
+    // =============================================================
     private static void setupHoverGlow(Region node, BooleanSupplier canHover) {
         node.setOnMouseEntered(e -> {
             if (canHover.getAsBoolean() && node.getOpacity() > 0.5) node.setEffect(HOVER_GLOW);
         });
+
         node.setOnMouseExited(e -> {
             node.setEffect(null);
             refreshTurnGlow();
@@ -566,13 +804,17 @@ public class BattleScene {
     }
 
     private static void refreshInteractivity(BattleStage stage) {
+
         if (stage == BattleStage.HERO_CHOOSE_SKILL) {
+
             setHeroInputEnabled(true);
             logLabel.setText("Choose Hero skill");
             refreshButtons();
             heroBox.setDisable(false);
             monsterBox.setDisable(false);
+
         } else if (stage == BattleStage.HERO_CHOOSE_TARGET) {
+
             logLabel.setText("Choose a monster target");
             normalBtn.setDisable(true);
             skillBtn.setDisable(true);
@@ -580,7 +822,9 @@ public class BattleScene {
 
             heroBox.setDisable(true);
             monsterBox.setDisable(false);
+
         } else if (stage == BattleStage.HERO_CHOOSE_ALLY) {
+
             logLabel.setText("Choose an ally target");
             normalBtn.setDisable(true);
             skillBtn.setDisable(true);
@@ -588,7 +832,9 @@ public class BattleScene {
 
             heroBox.setDisable(false);
             monsterBox.setDisable(true);
+
         } else if (stage == BattleStage.MONSTER_TURN) {
+
             logLabel.setText("Monster turn...");
             setHeroInputEnabled(false);
 
@@ -598,10 +844,14 @@ public class BattleScene {
                 engine.executeMonsterTurnAndContinue();
             });
             p.play();
+
         } else if (stage == BattleStage.WIN_TURN) {
+
             setHeroInputEnabled(false);
             logLabel.setText("Victory!");
+
         } else if (stage == BattleStage.LOSE_TURN) {
+
             setHeroInputEnabled(false);
             logLabel.setText("Defeat!");
         }
@@ -626,7 +876,14 @@ public class BattleScene {
             -fx-padding: 10 18;
         """);
 
-        btn.setOnMouseEntered(e -> { btn.setScaleX(1.08); btn.setScaleY(1.08); });
-        btn.setOnMouseExited(e -> { btn.setScaleX(1); btn.setScaleY(1); });
+        btn.setOnMouseEntered(e -> {
+            btn.setScaleX(1.08);
+            btn.setScaleY(1.08);
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1);
+            btn.setScaleY(1);
+        });
     }
 }
