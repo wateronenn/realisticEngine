@@ -29,6 +29,8 @@ import java.util.function.BooleanSupplier;
 public class BattleScene {
 
     // ======================= NODES =======================
+    private static GameEngine GAMEENGINE;
+    private static Stage STAGE ;
     private static Pane heroBox;
     private static Pane monsterBox;
     // TOP CORNER BACKGROUND PANELS
@@ -39,6 +41,7 @@ public class BattleScene {
     private static Label stageLabel;
 
     private static Button normalBtn, skillBtn, ultBtn;
+    private static Button cancelBtn;
 
     // TOP CORNER ELEMENT ICONS
     private static HBox heroElementBoxTopLeft;
@@ -62,6 +65,7 @@ public class BattleScene {
 
     // per-hero timer (attack image back to idle)
     private static final Map<Heroes, Animation> heroTempAnimMap = new HashMap<>();
+    private static final Map<Monster, Animation> monsterTempAnimMap = new HashMap<>();
 
     // ======================= TURN TRACKING =======================
     private static BattleStage lastStage = null;
@@ -74,6 +78,34 @@ public class BattleScene {
 
     // ======================= DATA =======================
     private static final String[] monsterType = new String[3];
+
+    // ===================== COLOR ======================
+    private static final String ORANGE_STYLE = """
+        -fx-background-color: linear-gradient(#ff7a18, #ffb347);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-background-radius: 18;
+        -fx-padding: 10 18;
+    """;
+
+        private static final String GREEN_STYLE = """
+        -fx-background-color: linear-gradient(#00c853, #2e7d32);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-background-radius: 18;
+        -fx-padding: 10 18;
+    """;
+
+        private static final String RED_STYLE = """
+        -fx-background-color: linear-gradient(#ff4d4d, #b30000);
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14px;
+        -fx-background-radius: 18;
+        -fx-padding: 10 18;
+    """;
 
     // =============================================================
     //                         HP BAR UI
@@ -234,6 +266,55 @@ public class BattleScene {
         );
     }
 
+    private static Image heroShieldImg(Heroes h) {
+        String name = h.getName();
+        return loadImageSafe(
+                "/Heroes/" + name + "/" + name + "Shield.PNG",
+                "/Heroes/" + name + "/" + name + "Still.PNG"
+        );
+    }
+    private static Image heroDeadImg(Heroes h) {
+        String name = h.getName();
+        return loadImageSafe(
+                "/Heroes/" + name + "/" + name + "IsDead.PNG",
+                "/Heroes/" + name + "/" + name + "Still.PNG"
+        );
+    }
+    private static Image monsterIdleImg(Monster m) {
+        String name = m.getName();
+        String e = m.getElement().toString();
+        System.out.println("/Monster/" + name + "/" + e + "/Norm.png");
+        return loadImageSafe(
+                "/Monster/" + name + "/" + e + "/Norm.png",
+                "/Monster/" + name + "/" + e + "/Norm.png"
+        );
+    }
+    private static Image monsterAttackImg(Monster m) {
+        String name = m.getName();
+        String e = m.getElement().toString();
+        return loadImageSafe(
+                "/Monster/" + name + "/" + e + "/Attack.png",
+                "/Monster/" + name + "/" + e + "/Norm.png"
+        );
+    }
+
+    private static Image monsterDeadImg(Monster m) {
+        String name = m.getName();
+        String e = m.getElement().toString();
+        return loadImageSafe(
+                "/Monster/" + name + "/" + e + "/Dead.png",
+                "/Monster/" + name + "/" + e + "/Norm.png"
+        );
+    }
+    private static Image heroBaseImg(Heroes h) {
+        if (h == null) return null;
+        if (h.isDead()) return heroDeadImg(h);
+        if (h.getShield() > 0) return heroShieldImg(h);
+        return heroIdleImg(h);
+    }
+    private static Image monsterBaseImg(Monster m) {
+        return m.isDead() ? monsterDeadImg(m) : monsterIdleImg(m);
+    }
     // Show Attack.PNG for 1.0s then back to Still.PNG
     private static void showAttackFor1_5s(Heroes h) {
         if (h == null || h.isDead()) return;
@@ -245,14 +326,34 @@ public class BattleScene {
         if (old != null) old.stop();
 
         Image atk = heroAttackImg(h);
-        Image idle = heroIdleImg(h);
-        if (atk == null || idle == null) return;
+        if (atk == null) return;
 
         iv.setImage(atk);
 
         PauseTransition back = new PauseTransition(Duration.seconds(1));
-        back.setOnFinished(e -> iv.setImage(idle));
+        back.setOnFinished(e -> {
+            Image base = heroBaseImg(h);      // <- IMPORTANT
+            if (base != null) iv.setImage(base);
+        });
+
         heroTempAnimMap.put(h, back);
+        back.play();
+    }
+    private static void showMonsterAttackFor1s(Monster m) {
+        if (m == null || m.isDead()) return;
+
+        ImageView iv = monsterImageMap.get(m);
+        if (iv == null) return;
+
+        Animation old = monsterTempAnimMap.get(m);
+        if (old != null) old.stop();
+
+        iv.setImage(monsterAttackImg(m));
+
+        PauseTransition back = new PauseTransition(Duration.seconds(1));
+        back.setOnFinished(e -> iv.setImage(monsterBaseImg(m)));
+
+        monsterTempAnimMap.put(m, back);
         back.play();
     }
 
@@ -319,7 +420,7 @@ public class BattleScene {
 
         if (model == null) return;
 
-        // HERO: element + HERO ICON overlay (like your old code)
+
         List<Heroes> heroes = model.getHERO_TEAM();
         for (int i = 0; i < heroes.size(); i++) {
             Heroes h = heroes.get(i);
@@ -328,7 +429,6 @@ public class BattleScene {
             heroElementBoxTopLeft.getChildren().add(overlay);
         }
 
-        // MONSTER: element + Norm.png overlay
         List<Monster> monsters = model.getMONSTER_TEAM();
         for (int i = 0; i < monsters.size(); i++) {
             Monster m = monsters.get(i);
@@ -347,7 +447,6 @@ public class BattleScene {
         elementView.setFitHeight(60);
         elementView.setPreserveRatio(true);
 
-        // Hero icon (same as your old path)
         String name = hero.getName();
         Image heroIcon = loadImageSafe(
                 "/Heroes/" + name + "/" + name + "Icon.PNG",
@@ -395,9 +494,7 @@ public class BattleScene {
         elementView.setFitHeight(60);
         elementView.setPreserveRatio(true);
 
-        // Monster Norm.png path using your monsterType[]
-        String type = monsterType[index];
-        String normPath = "/Monster/" + type + "/" + m.getElement() + "/Norm.png";
+        String normPath = "/Monster/" + m.getName() + "/" + m.getElement() + "/Norm.png";
         Image monsterImg = loadImageSafe(normPath, normPath);
 
         ImageView monsterView = new ImageView(monsterImg);
@@ -434,7 +531,7 @@ public class BattleScene {
         return overlay;
     }
 
-    // Optional: if elements can change mid battle, call this to refresh images
+
     private static void refreshTopCornerElementIcons() {
         if (model == null) return;
 
@@ -464,12 +561,7 @@ public class BattleScene {
         return model.getHERO_TEAM().get(idx);
     }
 
-    /**
-     * Core logic:
-     * 1) Hero->Hero: when active hero changes during hero decision stages -> previous hero ended turn => show attack on previous hero
-     * 2) Last hero: when stage transitions into MONSTER_TURN -> last hero ended hero phase => show attack on heroBeforeMonsterTurn
-     * 3) Do NOT trigger after monster turn ends (MONSTER_TURN -> HERO_CHOOSE_...) because we never fire there.
-     */
+
     private static void handleEndTurnAttackImage(BattleStage currentStage) {
         Heroes currentActive = safeGetActiveHero();
 
@@ -507,6 +599,8 @@ public class BattleScene {
 
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
         engine = new BattleEngine(model);
+        GAMEENGINE = gameEngine;
+        STAGE = stage;
 
         Random rand = new Random();
         for (int i = 0; i < 3; i++) monsterType[i] = "Type" + (rand.nextInt(3) + 1);
@@ -557,8 +651,12 @@ public class BattleScene {
         styleButton(normalBtn);
         styleButton(skillBtn);
         styleButton(ultBtn);
+        cancelBtn = new Button("Cancel");
+        styleButton(cancelBtn);
 
-        HBox skillBar = new HBox(10, normalBtn, skillBtn, ultBtn);
+        cancelBtn.setOnAction(e -> engine.onCancelSelection()); // new engine method
+
+        HBox skillBar = new HBox(10, normalBtn, skillBtn, ultBtn, cancelBtn);
         skillBar.setAlignment(Pos.CENTER);
 
         controls.getChildren().addAll(stageLabel, logLabel, skillBar);
@@ -569,9 +667,15 @@ public class BattleScene {
         root.getChildren().addAll(heroBox, monsterBox, controls);
 
         // Buttons
-        normalBtn.setOnAction(e -> engine.onClickHeroSkill(SkillType.NORMAL_ATTACK));
-        skillBtn  .setOnAction(e -> engine.onClickHeroSkill(SkillType.SKILL));
-        ultBtn    .setOnAction(e -> engine.onClickHeroSkill(SkillType.ULTIMATE));
+        normalBtn.setOnAction(e -> {
+            engine.onClickHeroSkill(SkillType.NORMAL_ATTACK);
+        });
+        skillBtn.setOnAction(e -> {
+            engine.onClickHeroSkill(SkillType.SKILL);
+        });
+        ultBtn.setOnAction(e -> {
+            engine.onClickHeroSkill(SkillType.ULTIMATE);
+        });
 
         engine.setListener(new BattleListener() {
             @Override
@@ -701,6 +805,16 @@ public class BattleScene {
             ui.animateTo(newHp);
 
             card.setOpacity(h.isDead() ? 0.35 : 1.0);
+            Animation temp = heroTempAnimMap.get(h);
+            boolean tempRunning = (temp != null && temp.getStatus() == Animation.Status.RUNNING);
+
+            if (!tempRunning) {
+                ImageView iv = heroImageMap.get(h);
+                if (iv != null) {
+                    Image base = heroBaseImg(h);
+                    if (base != null) iv.setImage(base);
+                }
+            }
         }
 
         for (Monster m : model.getMONSTER_TEAM()) {
@@ -715,7 +829,15 @@ public class BattleScene {
             ui.animateTo(newHp);
 
             card.setOpacity(m.isDead() ? 0.35 : 1.0);
+            Animation temp = monsterTempAnimMap.get(m);
+            boolean tempRunning = (temp != null && temp.getStatus() == Animation.Status.RUNNING);
+
+            if (!tempRunning) {
+                ImageView iv = monsterImageMap.get(m);
+                if (iv != null) iv.setImage(monsterBaseImg(m));
+            }
         }
+
     }
 
     // =============================================================
@@ -763,6 +885,11 @@ public class BattleScene {
         return box;
     }
 
+    private static void setMonsterImage(Monster m, Image img) {
+        ImageView iv = monsterImageMap.get(m);
+        if (iv != null) iv.setImage(img);
+    }
+
     // =============================================================
     //                         UI HELPERS
     // =============================================================
@@ -776,7 +903,6 @@ public class BattleScene {
             refreshTurnGlow();
         });
     }
-
     private static void refreshButtons() {
         Heroes active = safeGetActiveHero();
         if (active == null) return;
@@ -804,7 +930,7 @@ public class BattleScene {
     }
 
     private static void refreshInteractivity(BattleStage stage) {
-
+        cancelBtn.setDisable(!(stage == BattleStage.HERO_CHOOSE_TARGET || stage == BattleStage.HERO_CHOOSE_ALLY));
         if (stage == BattleStage.HERO_CHOOSE_SKILL) {
 
             setHeroInputEnabled(true);
@@ -812,6 +938,9 @@ public class BattleScene {
             refreshButtons();
             heroBox.setDisable(false);
             monsterBox.setDisable(false);
+            styleButton(normalBtn);
+            styleButton(skillBtn);
+            styleButton(ultBtn);
 
         } else if (stage == BattleStage.HERO_CHOOSE_TARGET) {
 
@@ -822,6 +951,15 @@ public class BattleScene {
 
             heroBox.setDisable(true);
             monsterBox.setDisable(false);
+            if(model.getPendingSkill()==SkillType.NORMAL_ATTACK){
+                toggleNormalButton(normalBtn);
+            }
+            else if(model.getPendingSkill()==SkillType.SKILL){
+                toggleNormalButton(skillBtn);
+            }
+            else if(model.getPendingSkill()==SkillType.ULTIMATE){
+                toggleNormalButton(ultBtn);
+            }
 
         } else if (stage == BattleStage.HERO_CHOOSE_ALLY) {
 
@@ -833,48 +971,124 @@ public class BattleScene {
             heroBox.setDisable(false);
             monsterBox.setDisable(true);
 
-        } else if (stage == BattleStage.MONSTER_TURN) {
-
+        }else if (stage == BattleStage.MONSTER_TURN) {
+            styleButton(normalBtn);
+            styleButton(skillBtn);
+            styleButton(ultBtn);
             logLabel.setText("Monster turn...");
             setHeroInputEnabled(false);
 
-            PauseTransition p = new PauseTransition(Duration.millis(2000));
-            p.setOnFinished(e -> {
-                engine.monsterTurn();
-                engine.executeMonsterTurnAndContinue();
+            PauseTransition startDelay = new PauseTransition(Duration.millis(500));
+            startDelay.setOnFinished(e -> {
+
+                List<Monster> monsters = model.getMONSTER_TEAM(); // or however you store them
+
+                playAllMonstersAttack(
+                        monsters,
+                        0,
+                        () -> {
+                            engine.executeMonsterTurnAndContinue();
+                        },
+                        (Monster m) -> {
+                            engine.monsterAttackOne(m);
+                        }
+                );
             });
-            p.play();
-
+            startDelay.play();
         } else if (stage == BattleStage.WIN_TURN) {
-
             setHeroInputEnabled(false);
             logLabel.setText("Victory!");
+            VictoryScene.show(getStage(),getGameEngine());
 
         } else if (stage == BattleStage.LOSE_TURN) {
-
             setHeroInputEnabled(false);
             logLabel.setText("Defeat!");
+            DefeatScene.show(getStage(),getGameEngine());
         }
     }
+    private static void playSingleMonsterAttack(
+            Monster m,
+            Runnable applyDamageThenUpdateUi,
+            Runnable afterDone) {
 
+        if (m == null || m.isDead()) {
+            afterDone.run();
+            return;
+        }
+
+        ImageView iv = monsterImageMap.get(m);
+        if (iv == null) {
+            applyDamageThenUpdateUi.run();
+            afterDone.run();
+            return;
+        }
+
+        Animation old = monsterTempAnimMap.get(m);
+        if (old != null) old.stop();
+
+        // 1️⃣ show attack image
+        iv.setImage(monsterAttackImg(m));
+
+        // 2️⃣ after 600ms -> apply damage
+        PauseTransition hitMoment = new PauseTransition(Duration.millis(600));
+
+        // 3️⃣ after damage, wait 400ms -> revert + continue
+        PauseTransition finish = new PauseTransition(Duration.millis(400));
+
+        hitMoment.setOnFinished(e -> {
+            applyDamageThenUpdateUi.run();   // damage happens here
+            finish.play();
+        });
+
+        finish.setOnFinished(e -> {
+            iv.setImage(monsterBaseImg(m));  // back to idle or dead
+            afterDone.run();                 // move to next monster
+        });
+
+        monsterTempAnimMap.put(m, finish);
+        hitMoment.play();
+    }
+    private static void playAllMonstersAttack(List<Monster> monsters, int idx, Runnable onAllDone,
+                                              java.util.function.Consumer<Monster> applyDamageForMonster) {
+        // skip finished
+        if (idx >= monsters.size()) {
+            onAllDone.run();
+            return;
+        }
+
+        Monster m = monsters.get(idx);
+
+        playSingleMonsterAttack(
+                m,
+                () -> {
+                    // apply damage for this monster (engine logic)
+                    applyDamageForMonster.accept(m);
+
+                    // refresh UI after damage
+                    updateUnitsAnimated();
+                },
+                () -> {
+                    // next monster
+                    playAllMonstersAttack(monsters, idx + 1, onAllDone, applyDamageForMonster);
+                }
+        );
+    }
     private static void setHeroInputEnabled(boolean enabled) {
         normalBtn.setDisable(!enabled);
         skillBtn.setDisable(!enabled);
         ultBtn.setDisable(!enabled);
+        cancelBtn.setDisable(!enabled);
 
         heroBox.setDisable(!enabled);
         monsterBox.setDisable(!enabled);
     }
-
     private static void styleButton(Button btn) {
-        btn.setStyle("""
-            -fx-background-color: linear-gradient(#ff7a18, #ffb347);
-            -fx-text-fill: white;
-            -fx-font-weight: bold;
-            -fx-font-size: 14px;
-            -fx-background-radius: 18;
-            -fx-padding: 10 18;
-        """);
+
+        if (btn == cancelBtn) {
+            btn.setStyle(RED_STYLE);
+        } else {
+            btn.setStyle(ORANGE_STYLE);
+        }
 
         btn.setOnMouseEntered(e -> {
             btn.setScaleX(1.08);
@@ -885,5 +1099,14 @@ public class BattleScene {
             btn.setScaleX(1);
             btn.setScaleY(1);
         });
+    }
+    private static void toggleNormalButton(Button btn) {
+        btn.setStyle(GREEN_STYLE);
+    }
+    private static GameEngine getGameEngine(){
+        return GAMEENGINE;
+    }
+    private static Stage getStage(){
+        return STAGE;
     }
 }

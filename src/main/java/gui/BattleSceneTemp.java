@@ -638,7 +638,7 @@ public class BattleSceneTemp {
 
             PauseTransition p = new PauseTransition(Duration.millis(2000));
             p.setOnFinished(e -> {
-                engine.monsterTurn();
+                //engine.monsterTurn();
                 engine.executeMonsterTurnAndContinue();
             });
             p.play();
