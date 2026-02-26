@@ -373,7 +373,7 @@ public class BattleScene {
 
         final Label text = new Label();
 
-        final double maxHp;
+        double maxHp;
         double currentHp;
 
         HpBarUI(double maxHp, double currentHp) {
@@ -1074,7 +1074,7 @@ public class BattleScene {
 
         heroImageMap.put(heroRef, iv);
 
-        HpBarUI hpUI = new HpBarUI(hp, hp);
+        HpBarUI hpUI = new HpBarUI(heroRef.getMaxHp(), hp);
         heroHpMap.put(heroRef, hpUI);
 
         VBox box = new VBox(8, hpUI.node(), iv);
@@ -1096,7 +1096,7 @@ public class BattleScene {
 
         monsterImageMap.put(monsterRef, iv);
 
-        HpBarUI hpUI = new HpBarUI(hp, hp);
+        HpBarUI hpUI = new HpBarUI(monsterRef.getMaxHp(), hp);
         monsterHpMap.put(monsterRef, hpUI);
 
         VBox box = new VBox(8, hpUI.node(), iv);
