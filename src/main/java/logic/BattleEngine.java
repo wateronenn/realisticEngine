@@ -24,6 +24,9 @@ public class BattleEngine {
             setBattleStage(BattleStage.LOSE_TURN);
             GameEngine.setGameState(GameState.DEFEAT);
         }
+        for(Heroes h :model.getHERO_TEAM()){
+            h.resetAfterTurn();
+        }
         setTurnCounter(1);
     }
     public void setListener(BattleListener listener){
@@ -126,6 +129,20 @@ public class BattleEngine {
         afterHeroAction();
         return true;
     }
+    public void onCancelSelection() {
+        BattleStage s = getBattleStage();
+
+        // Only allow cancel during hero selection stages
+        if (s != BattleStage.HERO_CHOOSE_TARGET && s != BattleStage.HERO_CHOOSE_ALLY) return;
+
+        // Clear whatever pending choice you stored
+        model.setPendingSkill(null);
+
+        setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
+        emitState(stage);
+        emitUpdate();
+    }
+
 
     private int findNextAliveHeroIndex(int currentIdx) {
         List<Heroes> hs = model.getHERO_TEAM();
@@ -177,16 +194,17 @@ public class BattleEngine {
         return;  // ✅ THIS is the missing piece
     }
 
-    public void monsterTurn(){
-        for(Monster m : model.getMONSTER_TEAM()){
-            if(m.isDead()) continue;
-            Heroes target = pickRandomAliveHero();
-            if(target == null) return;
-            m.attack(target);
-            emitUpdate();
-            if(isHeroAllDead()) return;
-        }
+    // Attack exactly ONE monster (so UI can animate per monster)
+    public void monsterAttackOne(Monster m) {
+        if (m == null || m.isDead()) return;
+
+        Heroes target = pickRandomAliveHero();
+        if (target == null) return;
+
+        m.attack(target);
+        emitUpdate();              // update HP, logs, etc.
     }
+
 
     public void executeMonsterTurnAndContinue() {
 
@@ -198,12 +216,18 @@ public class BattleEngine {
         }
 
         tickCooldownsForHeroes();
+        resetHeroShield();
         model.setActiveHeroIndex(findNextAliveHeroIndex(-1));
         int turn = getTurnCounter();
         setTurnCounter(turn+1);
         setBattleStage(BattleStage.HERO_CHOOSE_SKILL);
         emitState(stage);
         emitUpdate();
+    }
+    private void resetHeroShield(){
+        for(Heroes h : model.getHERO_TEAM()){
+            h.setShield(0);
+        }
     }
 
     private Heroes pickRandomAliveHero(){

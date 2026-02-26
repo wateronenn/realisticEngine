@@ -166,5 +166,16 @@ public abstract class Heroes extends Unit {
     public int getUltCdRemain() {
         return ultCdRemain;
     }
+    //TODO reset hero stat's after win turn before go to next stage
+    public void resetAfterTurn(){
+        if(isDead()){
+            // reset blood about 50%
+            //reset cooldown and everthing
+        }
+        else{
+            //reset blood to 100
+            //reset cooldown and everything
+        }
+    }
 
 }
