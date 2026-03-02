@@ -7,7 +7,7 @@ import logic.SkillType;
 
 public class Caster extends Heroes implements Buffing {
     public Caster(){
-        super("Caster",50,220,5);
+        super("Caster",50,260,5);
         setHeroClass("Caster");
         setActionOrder(3);
         skillCdMax = 2;

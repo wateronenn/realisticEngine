@@ -9,7 +9,7 @@ public class Archer extends Heroes {
 
     public Archer(){
 
-        super("Archer",50,220,5);
+        super("Archer",50,270,5);
         setHeroClass("Archer");
         setActionOrder(4);
         skillCdMax = 0;
@@ -35,6 +35,7 @@ public class Archer extends Heroes {
             attack(t,dmgPerUnit);
         }
         triggerUltCd();
+        resetBow();
     }
     public void resetBow(){
         bowStack=1;
