@@ -71,15 +71,7 @@ public abstract class Heroes extends Unit {
     public double effectiveAtk() {
         return super.getAtk() * atkMul + atkFlat;
     }
-    public void onTurnEnd() {
-        if (atkBuffTurns > 0) {
-            atkBuffTurns--;
-            if (atkBuffTurns == 0) {
-                atkMul = 1.0;
-                atkFlat = 0.0;
-            }
-        }
-    }
+
     public abstract void normalAttack(Unit target);
     public abstract void skill(Target target);
     public abstract void ultimate(Target target);
@@ -109,15 +101,7 @@ public abstract class Heroes extends Unit {
         return heroClass;
     }
 
-    public void EndRound(){
-        setHp(getHp()+0.7*getMaxHp());
-        setShield(0);
-        setAtkFlat(0);
-        setAtkMul(1.0);
-        setAtkBuffTurns(0);
 
-        scale();
-    }
 
     public void setAtkMul(double atkMul) {
         this.atkMul = atkMul;
@@ -169,13 +153,19 @@ public abstract class Heroes extends Unit {
     //TODO reset hero stat's after win turn before go to next stage
     public void resetAfterTurn(){
         if(isDead()){
-            // reset blood about 50%
-            //reset cooldown and everthing
+            setHp(0.7*getMaxHp());
         }
         else{
-            //reset blood to 100
-            //reset cooldown and everything
+            setHp(getMaxHp());
         }
+        this.resetAllCooldowns();
+
+        setShield(0);
+        setAtkFlat(0);
+        setAtkMul(1.0);
+        setAtkBuffTurns(0);
+
+        scale();
     }
 
 }

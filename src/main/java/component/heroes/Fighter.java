@@ -8,7 +8,7 @@ import logic.SkillType;
 public class Fighter extends Heroes implements Healing {
     public Fighter(){
 
-        super("Fighter",40,320,15);
+        super("Fighter",40,350,9);
         setHeroClass("Fighter");
         setActionOrder(2);
         skillCdMax = 2;

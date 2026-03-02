@@ -10,7 +10,7 @@ import logic.SkillType;
 public class Tank extends Heroes implements Healing, Buffing {
 
     public Tank() {
-        super("Tank",20,500,20);
+        super("Tank",20,480,15);
         setHeroClass("Tank");
         setActionOrder(1);
         skillCdMax = 3;
@@ -35,7 +35,7 @@ public class Tank extends Heroes implements Healing, Buffing {
     @Override
     public void heal(Unit target) {
         // heal 50% of target max HP (intended)
-        healAmount(target, 0.5 * target.getMaxHp());
+        healAmount(target, 0.3 * target.getMaxHp());
     }
 
     @Override
