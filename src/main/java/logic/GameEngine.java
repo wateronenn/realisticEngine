@@ -35,7 +35,7 @@ public class GameEngine {
         if (MONSTER_TEAM == null) MONSTER_TEAM = new ArrayList<>();
         else MONSTER_TEAM.clear();
 
-        setStageCounter(1);
+        setStageCounter(0);
         setCountReroll(0);
         setUpgradeHero(null);
         MONSTER_FACTORY= new MonsterFactory();
