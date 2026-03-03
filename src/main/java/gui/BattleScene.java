@@ -112,8 +112,6 @@ public class BattleScene {
     // highlight hovered skill button
     private static final DropShadow BTN_GLOW = new DropShadow(18, Color.BLACK);
 
-    // ======================= DATA =======================
-    private static final String[] monsterType = new String[3];
 
     // TOP CENTER STAGE COUNTER PANEL
     private static StackPane stageCounterPanelTopCenter;
@@ -875,9 +873,6 @@ public class BattleScene {
         GAMEENGINE = gameEngine;
         STAGE = stage;
 
-        Random rand = new Random();
-        for (int i = 0; i < 3; i++) monsterType[i] = "Type" + (rand.nextInt(3) + 1);
-
         AnchorPane root = new AnchorPane();
         root.setPadding(new Insets(8));
 
@@ -889,6 +884,7 @@ public class BattleScene {
 
         root.getChildren().add(stageCounterPanelTopCenter);
 
+        Random rand = new Random();
         int number = rand.nextInt(3) + 1;
         Image bg = new Image(application.Main.class
                 .getResource("/Background/BattleStage" + number + ".png")
@@ -1085,7 +1081,7 @@ public class BattleScene {
             Monster m = monsters.get(i);
 
             // ✅ store the chosen typeName per monster, so attack/idle/dead use same folder
-            String typeName = monsterType[i];
+            String typeName = monsters.get(i).getName();
             monsterTypeMap.put(m, typeName);
 
             VBox card = unitCardWithHpBar_Monster(typeName, m.getHp(), m.isDead(), m.getElement(), m);
