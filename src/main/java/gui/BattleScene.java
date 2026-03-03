@@ -2,6 +2,7 @@ package gui;
 
 import component.Element;
 import component.Monster;
+import component.heroes.Archer;
 import component.heroes.Heroes;
 import javafx.animation.*;
 import javafx.application.Platform;
@@ -16,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.*;
@@ -30,8 +32,8 @@ public class BattleScene {
 
     // ======================= CHANGE IMAGE PATH HERE =======================
     // Panels background (your frame background)
-    private static final String SKILL_PANEL_BG_PATH = "/Sign/ElementSlot.png";
-    private static final String DESC_PANEL_BG_PATH  = "/Sign/ElementSlot.png";
+    private static final String SKILL_PANEL_BG_PATH = "/Sign/SkillandDescPanel.png";
+    private static final String DESC_PANEL_BG_PATH  = "/Sign/SkillandDescPanel.png";
 
     // Skill buttons images (CHANGE HERE)
     private static final String NORMAL_BTN_IMG_PATH = "/Button/Normal.png";
@@ -95,6 +97,9 @@ public class BattleScene {
     private static final Map<Heroes, Animation> heroTempAnimMap = new HashMap<>();
     private static final Map<Monster, Animation> monsterTempAnimMap = new HashMap<>();
 
+    // ✅ IMPORTANT: Monster "typeName" mapping (Type1/Type2/Type3) used by your card paths
+    private static final Map<Monster, String> monsterTypeMap = new HashMap<>();
+
     // ======================= TURN TRACKING =======================
     private static BattleStage lastStage = null;
     private static Heroes lastActiveHero = null;          // active hero at last stage
@@ -105,10 +110,14 @@ public class BattleScene {
     private static final DropShadow HOVER_GLOW = new DropShadow(25, Color.AQUA);
 
     // highlight hovered skill button
-    private static final DropShadow BTN_GLOW = new DropShadow(18, Color.LIMEGREEN);
+    private static final DropShadow BTN_GLOW = new DropShadow(18, Color.BLACK);
 
     // ======================= DATA =======================
     private static final String[] monsterType = new String[3];
+
+    // TOP CENTER STAGE COUNTER PANEL
+    private static StackPane stageCounterPanelTopCenter;
+    private static Label stageCounterLabel;
 
     // =============================================================
     //                  SKILL DESCRIPTION DATA
@@ -241,7 +250,7 @@ public class BattleScene {
         ));
 
         // ================== CHANGE SKILL PANEL SIZE HERE ==================
-        double panelW = 520;
+        double panelW = 650;
         double panelH = 110;
         // ================================================================
 
@@ -252,20 +261,13 @@ public class BattleScene {
 
         HBox bar = new HBox(12, normalBtn, skillBtn, ultBtn, cancelBtn);
         bar.setAlignment(Pos.CENTER_LEFT);
-        bar.setPadding(new Insets(0, 20, 0, 20));
+        bar.setPadding(new Insets(0, 0, 0, 40));
 
         StackPane panel = new StackPane(bg, bar);
         panel.setPrefSize(panelW, panelH);
         panel.setMinSize(panelW, panelH);
         panel.setMaxSize(panelW, panelH);
 
-        // white stroke border
-        panel.setStyle("""
-            -fx-border-color: white;
-            -fx-border-width: 2;
-            -fx-border-radius: 12;
-            -fx-background-radius: 12;
-        """);
 
         StackPane.setAlignment(bar, Pos.CENTER_LEFT);
         return panel;
@@ -276,14 +278,18 @@ public class BattleScene {
         actionNameLabel = new Label("Action: -");
         actionDescLabel = new Label("Description: -");
 
+        Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),12);
+        Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),10);
         heroNameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-        actionNameLabel.setStyle("-fx-text-fill: black; -fx-font-size: 14px; -fx-font-weight: bold;");
-        actionDescLabel.setStyle("-fx-text-fill: black; -fx-font-size: 13px;");
+        actionNameLabel.setStyle("-fx-text-fill: black;");
+        actionNameLabel.setFont(font2);
+        actionDescLabel.setStyle("-fx-text-fill: black;");
+        actionDescLabel.setFont(font3);
 
         actionDescLabel.setWrapText(true);
 
         VBox textBox = new VBox(6, actionNameLabel, actionDescLabel);
-        textBox.setPadding(new Insets(0, 20, 0, 70)); // adjust text offset
+        textBox.setPadding(new Insets(0, 20, 0, 40)); // adjust text offset
         textBox.setAlignment(Pos.CENTER_LEFT);
 
         ImageView bg = new ImageView(new Image(
@@ -292,7 +298,7 @@ public class BattleScene {
 
         // ================== CHANGE DESC PANEL SIZE HERE ==================
         double panelW = 420;
-        double panelH = 100;
+        double panelH = 110;
         // ================================================================
 
         bg.setFitWidth(panelW);
@@ -304,14 +310,6 @@ public class BattleScene {
         panel.setPrefSize(panelW, panelH);
         panel.setMinSize(panelW, panelH);
         panel.setMaxSize(panelW, panelH);
-
-        // white stroke border
-        panel.setStyle("""
-            -fx-border-color: white;
-            -fx-border-width: 2;
-            -fx-border-radius: 12;
-            -fx-background-radius: 12;
-        """);
 
         StackPane.setAlignment(textBox, Pos.CENTER_LEFT);
         return panel;
@@ -341,7 +339,52 @@ public class BattleScene {
         }
 
         actionNameLabel.setText(selectedSkillType + ": " + info.name(selectedSkillType));
-        actionDescLabel.setText(info.desc(selectedSkillType));
+        if(info.name(selectedSkillType) == "Arrow Stock" && currentTurnHero instanceof Archer){
+            actionDescLabel.setText(info.desc(selectedSkillType) + " (now : " + ((Archer) currentTurnHero).getBowStack() + ")");
+        }
+        else{
+            actionDescLabel.setText(info.desc(selectedSkillType));
+        }
+    }
+
+    private static StackPane buildStageCounterPanel(GameEngine gameEngine) {
+
+        // background image (reuse your panel image)
+        ImageView bg = new ImageView(new Image(
+                BattleScene.class.getResourceAsStream(SKILL_PANEL_BG_PATH)
+        ));
+
+        // panel size (adjust as you like)
+        double panelW = 200;
+        double panelH = 80;
+
+        bg.setFitWidth(panelW);
+        bg.setFitHeight(panelH);
+        bg.setPreserveRatio(false);
+        bg.setSmooth(true);
+
+        stageCounterLabel = new Label();
+        stageCounterLabel.setStyle("-fx-text-fill: black;");
+        Font f = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(), 18);
+        stageCounterLabel.setFont(f);
+
+        StackPane panel = new StackPane(bg, stageCounterLabel);
+        panel.setPrefSize(panelW, panelH);
+        panel.setMinSize(panelW, panelH);
+        panel.setMaxSize(panelW, panelH);
+
+        // center the text
+        StackPane.setAlignment(stageCounterLabel, Pos.CENTER);
+
+        updateStageCounter(gameEngine);
+        return panel;
+    }
+
+    private static void updateStageCounter(GameEngine gameEngine) {
+        if (stageCounterLabel == null || gameEngine == null) return;
+
+        // ✅ use your method name here:
+        stageCounterLabel.setText("STAGE  " + gameEngine.getStageCounter());
     }
 
     private static void onHeroTurnStartedForHud(Heroes hero) {
@@ -373,7 +416,7 @@ public class BattleScene {
 
         final Label text = new Label();
 
-        double maxHp;
+        final double maxHp;
         double currentHp;
 
         HpBarUI(double maxHp, double currentHp) {
@@ -534,21 +577,37 @@ public class BattleScene {
         );
     }
 
+    // ✅ Monster paths should match your card builder:
+    // "/Monster/" + typeName + "/" + element + "/Norm.png"
+    private static String monsterTypeName(Monster m) {
+        return monsterTypeMap.getOrDefault(m, m.getName()); // fallback
+    }
+
     private static Image monsterIdleImg(Monster m) {
-        String name = m.getName();
+        String type = monsterTypeName(m);
         String e = m.getElement().toString();
         return loadImageSafe(
-                "/Monster/" + name + "/" + e + "/Norm.png",
-                "/Monster/" + name + "/" + e + "/Norm.png"
+                "/Monster/" + type + "/" + e + "/Norm.png",
+                "/Monster/" + type + "/" + e + "/Norm.png"
         );
     }
 
     private static Image monsterDeadImg(Monster m) {
-        String name = m.getName();
+        String type = monsterTypeName(m);
         String e = m.getElement().toString();
         return loadImageSafe(
-                "/Monster/" + name + "/" + e + "/Dead.png",
-                "/Monster/" + name + "/" + e + "/Norm.png"
+                "/Monster/" + type + "/" + e + "/Dead.png",
+                "/Monster/" + type + "/" + e + "/Norm.png"
+        );
+    }
+
+    // ✅ NEW: monster attack image (Attack.png) for 1 sec
+    private static Image monsterAttackImg(Monster m) {
+        String type = monsterTypeName(m);
+        String e = m.getElement().toString();
+        return loadImageSafe(
+                "/Monster/" + type + "/" + e + "/Attack.png",
+                "/Monster/" + type + "/" + e + "/Norm.png"
         );
     }
 
@@ -585,6 +644,29 @@ public class BattleScene {
         });
 
         heroTempAnimMap.put(h, back);
+        back.play();
+    }
+
+    // ✅ NEW: Monster show attack for 1 second then revert
+    private static void showMonsterAttackFor1s(Monster m) {
+        if (m == null || m.isDead()) return;
+
+        ImageView iv = monsterImageMap.get(m);
+        if (iv == null) return;
+
+        Animation old = monsterTempAnimMap.get(m);
+        if (old != null) old.stop();
+
+        Image atk = monsterAttackImg(m);
+        if (atk != null) iv.setImage(atk);
+
+        PauseTransition back = new PauseTransition(Duration.seconds(1));
+        back.setOnFinished(e -> {
+            Image base = monsterBaseImg(m);
+            if (base != null) iv.setImage(base);
+        });
+
+        monsterTempAnimMap.put(m, back);
         back.play();
     }
 
@@ -691,6 +773,7 @@ public class BattleScene {
         elementView.setFitHeight(60);
         elementView.setPreserveRatio(true);
 
+        // keep your old overlay monster image (doesn't affect attack animation)
         String normPath = "/Monster/" + m.getName() + "/" + m.getElement() + "/Norm.png";
         Image monsterImg = loadImageSafe(normPath, normPath);
 
@@ -798,6 +881,14 @@ public class BattleScene {
         AnchorPane root = new AnchorPane();
         root.setPadding(new Insets(8));
 
+        stageCounterPanelTopCenter = buildStageCounterPanel(gameEngine);
+
+        // top anchor
+        AnchorPane.setTopAnchor(stageCounterPanelTopCenter, 10.0);
+        AnchorPane.setLeftAnchor(stageCounterPanelTopCenter,540.0);
+
+        root.getChildren().add(stageCounterPanelTopCenter);
+
         int number = rand.nextInt(3) + 1;
         Image bg = new Image(application.Main.class
                 .getResource("/Background/BattleStage" + number + ".png")
@@ -843,14 +934,14 @@ public class BattleScene {
 
         BorderPane hud = new BorderPane();
         hud.setLeft(skillPanel);
-        hud.setCenter(centerInfo);
+        //hud.setCenter(centerInfo);
         hud.setRight(descPanel);
         hud.setPadding(new Insets(10));
         hud.setPickOnBounds(false);
 
         AnchorPane.setLeftAnchor(hud, 10.0);
         AnchorPane.setRightAnchor(hud, 10.0);
-        AnchorPane.setBottomAnchor(hud, 0.0); // ✅ more bottom (change this)
+        AnchorPane.setBottomAnchor(hud, 0.0);
 
         root.getChildren().addAll(heroBox, monsterBox, hud);
 
@@ -964,6 +1055,8 @@ public class BattleScene {
         heroTempAnimMap.clear();
         monsterTempAnimMap.clear();
 
+        monsterTypeMap.clear(); // ✅
+
         List<Heroes> heroes = model.getHERO_TEAM();
         List<Monster> monsters = model.getMONSTER_TEAM();
 
@@ -991,7 +1084,11 @@ public class BattleScene {
         for (int i = 0; i < monsters.size(); i++) {
             Monster m = monsters.get(i);
 
-            VBox card = unitCardWithHpBar_Monster(monsterType[i], m.getHp(), m.isDead(), m.getElement(), m);
+            // ✅ store the chosen typeName per monster, so attack/idle/dead use same folder
+            String typeName = monsterType[i];
+            monsterTypeMap.put(m, typeName);
+
+            VBox card = unitCardWithHpBar_Monster(typeName, m.getHp(), m.isDead(), m.getElement(), m);
             final int idx = i;
 
             card.setLayoutX(MonstersCardPos[0][i]);
@@ -1022,7 +1119,11 @@ public class BattleScene {
             double oldHp = ui.currentHp;
             double newHp = h.getHp();
 
-            if (newHp < oldHp) playHitAnimation(card);
+            if (newHp < oldHp) {
+                Platform.runLater(() -> {
+                    playHitAnimation(card);
+                });
+            }
             ui.animateTo(newHp);
 
             card.setOpacity(h.isDead() ? 0.35 : 1.0);
@@ -1047,7 +1148,11 @@ public class BattleScene {
             double oldHp = ui.currentHp;
             double newHp = m.getHp();
 
-            if (newHp < oldHp) playHitAnimation(card);
+            if (newHp < oldHp) {
+                Platform.runLater(() -> {
+                    playHitAnimation(card);
+                });
+            }
             ui.animateTo(newHp);
 
             card.setOpacity(m.isDead() ? 0.35 : 1.0);
@@ -1234,7 +1339,10 @@ public class BattleScene {
         Animation old = monsterTempAnimMap.get(m);
         if (old != null) old.stop();
 
-        // quick fake "attack" -> just shake the target card, and update HP
+        // ✅ CHANGE IMAGE TO ATTACK for 1 second
+        showMonsterAttackFor1s(m);
+
+        // hit timing
         PauseTransition hitMoment = new PauseTransition(Duration.millis(600));
         PauseTransition finish = new PauseTransition(Duration.millis(400));
 
