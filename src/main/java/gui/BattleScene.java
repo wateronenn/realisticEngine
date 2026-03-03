@@ -28,6 +28,35 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
 
+/**
+ * The {@code BattleScene} class is responsible for rendering and controlling
+ * the graphical user interface of the battle phase in the game.
+ *
+ * <p>This class connects the {@link BattleEngine} and {@link BattleModel}
+ * with the JavaFX UI layer. It handles:</p>
+ *
+ * <ul>
+ *     <li>Displaying heroes and monsters</li>
+ *     <li>Rendering HP bars with animations</li>
+ *     <li>Managing skill selection and descriptions</li>
+ *     <li>Handling turn transitions</li>
+ *     <li>Playing attack and hit animations</li>
+ *     <li>Updating UI when the model changes</li>
+ * </ul>
+ *
+ * <p>The class uses static UI references to maintain a single active battle
+ * scene during runtime.</p>
+ *
+ * <p><b>Architecture Role:</b></p>
+ * <ul>
+ *     <li>View layer in MVC structure</li>
+ *     <li>Listens to {@link BattleListener} callbacks</li>
+ *     <li>Updates UI based on {@link BattleStage}</li>
+ * </ul>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class BattleScene {
 
     // ======================= CHANGE IMAGE PATH HERE =======================
@@ -181,6 +210,24 @@ public class BattleScene {
     // =============================================================
     //                  YOUR IMAGE BUTTON FUNCTION (used for skill/cancel)
     // =============================================================
+
+    /**
+     * Creates an image-based JavaFX button with hover and press animations.
+     *
+     * <p>The button uses an {@link ImageView} as its graphic and applies:
+     * <ul>
+     *     <li>Scale animation on hover</li>
+     *     <li>Drop shadow glow effect</li>
+     *     <li>Press translation animation</li>
+     * </ul>
+     *
+     * <p>The button background is fully transparent.</p>
+     *
+     * @param path resource path of the image
+     * @param fitW width of the image
+     * @param fitH height of the image
+     * @return a styled animated button
+     */
     private static Button createImageButton(String path, double fitW, double fitH) {
 
         Image img = new Image(BattleScene.class.getResourceAsStream(path));
@@ -403,6 +450,25 @@ public class BattleScene {
     // =============================================================
     //                         HP BAR UI
     // =============================================================
+
+    /**
+     * Represents a visual HP bar component for a unit.
+     *
+     * <p>This class handles:</p>
+     * <ul>
+     *     <li>Instant HP updates</li>
+     *     <li>Animated HP transitions</li>
+     *     <li>Damage lag effect</li>
+     *     <li>Color changes based on HP percentage</li>
+     * </ul>
+     *
+     * <p>HP bar colors:</p>
+     * <ul>
+     *     <li>Green: HP higher than 60%</li>
+     *     <li>Yellow: HP between 30% - 60%</li>
+     *     <li>Red: HP lower than 30%</li>
+     * </ul>
+     */
     private static class HpBarUI {
         final double barW = 250;
         final double barH = 20;
@@ -466,6 +532,14 @@ public class BattleScene {
             updateColor(ratio);
         }
 
+        /**
+         * Animates the HP bar to a new HP value.
+         *
+         * <p>If HP decreases, a delayed red damage bar effect is shown.
+         * If HP increases, the bar updates immediately.</p>
+         *
+         * @param newHp the new HP value
+         */
         void animateTo(double newHp) {
             double oldRatio = clamp01(currentHp / maxHp);
             double newRatio = clamp01(newHp / maxHp);
@@ -834,6 +908,20 @@ public class BattleScene {
         return model.getHERO_TEAM().get(idx);
     }
 
+    /**
+     * Handles attack image transitions when a turn ends.
+     *
+     * <p>This method determines whether:</p>
+     * <ul>
+     *     <li>A hero has finished their action</li>
+     *     <li>The monster phase has started</li>
+     * </ul>
+     *
+     * <p>If so, it temporarily shows the attack animation
+     * before reverting back to the idle image.</p>
+     *
+     * @param currentStage the current battle stage
+     */
     private static void handleEndTurnAttackImage(BattleStage currentStage) {
         Heroes currentActive = safeGetActiveHero();
 
@@ -866,6 +954,24 @@ public class BattleScene {
     // =============================================================
     //                           MAIN
     // =============================================================
+    /**
+     * Initializes and displays the battle scene.
+     *
+     * <p>This method sets up:</p>
+     * <ul>
+     *     <li>Battle model and engine</li>
+     *     <li>All UI components</li>
+     *     <li>Hero and monster cards</li>
+     *     <li>Skill HUD and description panels</li>
+     *     <li>Turn listeners</li>
+     * </ul>
+     *
+     * <p>After initialization, the battle begins automatically
+     * via {@link BattleEngine#beginBattle()}.</p>
+     *
+     * @param stage the primary JavaFX stage used to render the scene
+     * @param gameEngine the main game engine containing stage counter and team data
+     */
     public static void show(Stage stage, GameEngine gameEngine) {
 
         model = new BattleModel(GameEngine.getHeroTEAM(), GameEngine.getMonsterTeam());
@@ -1353,6 +1459,17 @@ public class BattleScene {
         hitMoment.play();
     }
 
+    /**
+     * Plays attack animations for all monsters sequentially.
+     *
+     * <p>This method ensures monsters attack one at a time
+     * rather than simultaneously.</p>
+     *
+     * @param monsters list of monsters
+     * @param idx current monster index
+     * @param onAllDone callback when all monsters finish attacking
+     * @param applyDamageForMonster logic to apply damage for each monster
+     */
     private static void playAllMonstersAttack(List<Monster> monsters, int idx, Runnable onAllDone,
                                               java.util.function.Consumer<Monster> applyDamageForMonster) {
         if (idx >= monsters.size()) {
