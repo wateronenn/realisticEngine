@@ -10,10 +10,6 @@ public abstract class Unit {
     private double def;
     private double maxHp;
     private Element element;
-    private double scaleMonster=1.09;
-    private double scaleHero=1.1;
-
-
 
     public Unit(String name,double atk, double maxHp, double def) {
         setName(name);
@@ -96,22 +92,6 @@ public abstract class Unit {
 
     public double getHpPercent() {
         return maxHp <= 0 ? 0 : (hp * 100.0 / maxHp);
-    }
-
-    public void setScaleHero(double scaleHero) {
-        this.scaleHero = scaleHero;
-    }
-
-    public double getScaleHero() {
-        return scaleHero;
-    }
-
-    public double getScaleMonster() {
-        return scaleMonster;
-    }
-
-    public void setScaleMonster(double scaleMonster) {
-        this.scaleMonster = scaleMonster;
     }
 
     public void castSkill(SkillType type, Target target) {};

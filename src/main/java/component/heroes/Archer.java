@@ -29,7 +29,7 @@ public class Archer extends Heroes {
     @Override
     public void ultimate(Target target) {
         var targets = target.many();
-        double totaldmg = bowStack * effectiveAtk()*0.7 + (100-getHpPercent())*0.6;
+        double totaldmg = bowStack * effectiveAtk()*( (10.00 + targets.size()) /10.00);
         for(Unit t:targets){
             double dmgPerUnit = totaldmg/targets.size();
             attack(t,dmgPerUnit);
