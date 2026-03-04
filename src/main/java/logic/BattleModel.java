@@ -3,6 +3,7 @@ package logic;
 import component.Monster;
 import component.heroes.Heroes;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class BattleModel {
      * @param monsters list of monsters participating in the battle
      */
     public BattleModel(List<Heroes> heroes, List<Monster> monsters) {
-        this.HERO_TEAM = heroes;
+        this.HERO_TEAM = new ArrayList<>(heroes);
         HERO_TEAM.sort(Comparator.comparing(Heroes::getActionOrder));
         this.MONSTER_TEAM = monsters;
     }
