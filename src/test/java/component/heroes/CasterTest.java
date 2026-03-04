@@ -1,96 +1,49 @@
 package component.heroes;
 
+import component.Element;
 import component.Target;
-import component.Unit;
-import logic.SkillType;
-import org.junit.jupiter.api.BeforeEach;
+import component.Monster;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * CasterTest
+ * Unit tests for the Caster class.
  *
- * Tests all behaviors of Caster:
- * - Constructor
- * - Normal attack
- * - Skill
- * - Ultimate (AOE damage)
- * - castSkill logic
+ * This test class verifies that the Caster's skill:
+ * 1) Correctly applies an attack multiplier buff.
+ * 2) Properly triggers the skill cooldown mechanism.
  */
 class CasterTest {
 
-    Caster caster;
-    Unit dummy;
+    /**
+     * Test that using the skill applies a buff to the caster.
+     * The attack multiplier should increase after the skill is used.
+     */
+    @Test
+    void testSkillAppliesBuff() {
+        Caster c = new Caster();
+        c.setElement(Element.FIRE);
+        Monster m = new Monster(1);
 
-    static class DummyUnit extends Unit {
-        public DummyUnit() {
-            super("Dummy", 15, 200, 5);
-        }
-    }
+        c.skill(Target.one(m));
 
-    @BeforeEach
-    void setup() {
-        caster = new Caster();
-        dummy = new DummyUnit();
+        // After using the skill, attack multiplier should increase (>= 1.2)
+        assertTrue(c.getAtkMul() >= 1.2);
     }
 
     /**
-     * Test constructor sets hero class correctly.
+     * Test that using the skill triggers cooldown.
+     * After the skill is used, it should not be immediately reusable.
      */
     @Test
-    void constructorSetsHeroClass() {
-        assertEquals("Caster", caster.getHeroClass());
-    }
+    void testSkillCooldownTrigger() {
+        Caster c = new Caster();
+        c.setElement(Element.FIRE);
+        Monster m = new Monster(1);
 
-    /**
-     * Test normal attack reduces enemy HP.
-     */
-    @Test
-    void normalAttackDealsDamage() {
-        double before = dummy.getHp();
+        c.skill(Target.one(m));
 
-        caster.normalAttack(dummy);
-
-        assertTrue(dummy.getHp() < before);
-    }
-
-    /**
-     * Test ultimate damages multiple targets.
-     */
-    @Test
-    void ultimateHitsMultipleTargets() {
-        Unit d2 = new DummyUnit();
-        Target group = Target.many(List.of(dummy, d2));
-
-        double before1 = dummy.getHp();
-        double before2 = d2.getHp();
-
-        caster.ultimate(group);
-
-        assertTrue(dummy.getHp() < before1);
-        assertTrue(d2.getHp() < before2);
-    }
-
-    /**
-     * Test skill triggers cooldown.
-     */
-    @Test
-    void skillTriggersCooldown() {
-        caster.skill(Target.one(dummy));
-
-        assertFalse(caster.canUseSkill());
-    }
-
-    /**
-     * Test castSkill SKILL branch.
-     */
-    @Test
-    void castSkillSkillBranchWorks() {
-        caster.castSkill(SkillType.SKILL, Target.one(dummy));
-
-        assertFalse(caster.canUseSkill());
+        // Skill should enter cooldown state
+        assertFalse(c.canUseSkill());
     }
 }

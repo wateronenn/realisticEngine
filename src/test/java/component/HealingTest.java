@@ -1,43 +1,52 @@
-package component;
+package component.heroes;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * HealingTest
+ * Unit tests for healing mechanics of different hero classes.
  *
- * Tests Healing interface behavior.
+ * This test class verifies that healing abilities correctly
+ * restore HP based on each hero's healing formula.
  */
 class HealingTest {
 
-    static class DummyUnit extends Unit {
-        public DummyUnit() {
-            super("Test", 10, 100, 5);
-        }
-    }
+    /**
+     * Test Fighter's self-healing ability.
+     * Fighter should heal based on 0.8 * atk.
+     * After healing, HP should be greater than before.
+     */
+    @Test
+    void testFighterHeal() {
+        Fighter f = new Fighter();
+        f.setHp(100);
 
-    static class Healer implements Healing {
+        double before = f.getHp();
 
-        /**
-         * Heals target by 20 HP.
-         */
-        @Override
-        public void heal(Unit target) {
-            target.setHp(target.getHp() + 20);
-        }
+        // Fighter heals himself
+        f.heal(f);
+
+        // HP should increase after healing
+        assertTrue(f.getHp() > before);
     }
 
     /**
-     * Test healing increases HP correctly.
+     * Test Tank's healing ability on an ally.
+     * Tank heals 30% of the ally's max HP.
      */
     @Test
-    void healingIncreasesHp() {
-        DummyUnit unit = new DummyUnit();
-        unit.setHp(50);
+    void testTankHeal() {
+        Tank tank = new Tank();
+        Fighter ally = new Fighter();
 
-        Healing healer = new Healer();
-        healer.heal(unit);
+        ally.setHp(100);
 
-        assertEquals(70, unit.getHp());
+        // Tank heals the ally
+        tank.heal(ally);
+
+        double expected = 100 + 0.3 * ally.getMaxHp();
+
+        // Ally's HP should match the expected healed amount
+        assertEquals(expected, ally.getHp(), 0.0001);
     }
 }

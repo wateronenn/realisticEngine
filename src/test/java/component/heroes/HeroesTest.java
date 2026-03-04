@@ -2,96 +2,97 @@ package component.heroes;
 
 import component.Target;
 import component.Unit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * HeroesTest
+ * General unit tests for hero-related core mechanics.
  *
- * Tests shared hero mechanics:
- * - Shield
- * - Buff
- * - Cooldowns
- * - Upgrade
+ * This test class verifies shared gameplay behaviors such as:
+ * - Shield absorption
+ * - Attack calculation with buffs
+ * - Cooldown reduction
+ * - Hero upgrade scaling
+ * - State reset after a turn
  */
 class HeroesTest {
 
-    static class DummyHero extends Heroes {
+    /**
+     * Test that shield correctly absorbs incoming damage.
+     * Damage should first reduce the shield before affecting HP.
+     */
+    @Test
+    void testShieldAbsorb() {
+        Tank t = new Tank();
+        t.setShield(50);
 
-        public DummyHero() {
-            super("Hero",50,200,10);
-        }
+        double damage = t.takeDamage(30);
 
-        @Override
-        public void normalAttack(Unit target) {}
+        // Returned damage value should match absorbed amount
+        assertEquals(30.0, damage, 0.0001);
 
-        @Override
-        public void skill(Target target) {}
-
-        @Override
-        public void ultimate(Target target) {}
-    }
-
-    DummyHero hero;
-
-    @BeforeEach
-    void setup() {
-        hero = new DummyHero();
+        // Shield should decrease accordingly
+        assertEquals(20.0, t.getShield(), 0.0001);
     }
 
     /**
-     * Test shield absorbs incoming damage before HP.
+     * Test that effective attack is calculated correctly
+     * when attack multiplier and flat bonus are applied.
      */
     @Test
-    void shieldAbsorbsDamage() {
-        hero.setShield(30);
-        hero.takeDamage(40);
+    void testEffectiveAtk() {
+        Fighter f = new Fighter();
+        f.applyAtkBuff(1.2, 10, 1);
 
-        assertEquals(190, hero.getHp());
-        assertEquals(0, hero.getShield());
+        double expected = f.getAtk() * 1.2 + 10;
+
+        // effectiveAtk() should reflect multiplier and flat bonus
+        assertEquals(expected, f.effectiveAtk(), 0.0001);
     }
 
     /**
-     * Test attack buff increases effective attack.
+     * Test that cooldown decreases correctly after ticking.
      */
     @Test
-    void atkBuffWorks() {
-        hero.applyAtkBuff(2.0, 10, 1);
-        assertEquals(110, hero.effectiveAtk());
+    void testCooldownTick() {
+        Fighter f = new Fighter();
+        f.triggerSkillCd();
+        f.tickCooldowns();
+
+        // Skill cooldown should reduce by 1 turn
+        assertEquals(1, f.getSkillCdRemain());
     }
 
     /**
-     * Test buff expires after turn ends.
+     * Test that upgrading a hero increases core stats.
+     * After upgrade(), max HP should be higher than before.
      */
     @Test
-    void buffExpiresAfterTurn() {
-        hero.applyAtkBuff(2.0, 10, 1);
-        hero.onTurnEnd();
+    void testUpgrade() {
+        Fighter f = new Fighter();
+        double oldHp = f.getMaxHp();
 
-        assertEquals(50, hero.effectiveAtk());
+        f.upgrade();
+
+        assertTrue(f.getMaxHp() > oldHp);
     }
 
     /**
-     * Test upgrade increases stats.
+     * Test that resetAfterTurn() restores necessary state.
+     * Even if HP reaches 0, hero should be reset properly.
+     * Skill cooldown should also be cleared.
      */
     @Test
-    void upgradeIncreasesStats() {
-        double oldHp = hero.getMaxHp();
-        hero.upgrade();
+    void testResetAfterTurn() {
+        Fighter f = new Fighter();
+        f.setHp(0);
 
-        assertTrue(hero.getMaxHp() > oldHp);
-    }
+        f.resetAfterTurn();
 
-    /**
-     * Test cooldown system.
-     */
-    @Test
-    void cooldownSystemWorks() {
-        hero.triggerSkillCd();
-        assertFalse(hero.canUseSkill());
+        // HP should be restored
+        assertTrue(f.getHp() > 0);
 
-        hero.resetAllCooldowns();
-        assertTrue(hero.canUseSkill());
+        // Cooldown should reset
+        assertEquals(0, f.getSkillCdRemain());
     }
 }

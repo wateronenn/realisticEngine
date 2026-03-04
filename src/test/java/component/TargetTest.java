@@ -5,42 +5,51 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * TargetTest
+ * Unit tests for the Target class.
  *
- * Tests single and multiple target creation
- * and validation methods.
+ * This test class verifies that Target correctly handles:
+ * 1) Single target creation.
+ * 2) Multiple target creation.
  */
 class TargetTest {
 
-    static class DummyUnit extends Unit {
-        public DummyUnit(String n) {
-            super(n, 10, 100, 5);
+    /**
+     * Dummy class extending Unit for testing purposes.
+     * Provides minimal implementation required for Target testing.
+     */
+    static class Dummy extends Unit {
+        public Dummy() {
+            super("Dummy", 10, 100, 5);
         }
     }
 
     /**
-     * Test single target creation.
+     * Test creation of a single target using Target.one().
+     * The Target instance should behave as a single target.
      */
     @Test
-    void singleTargetWorks() {
-        Unit u = new DummyUnit("A");
-        Target t = Target.one(u);
+    void testSingleTarget() {
+        Dummy d = new Dummy();
+        Target t = Target.one(d);
 
+        // Verify single-target behavior
         assertTrue(t.isSingle());
         assertFalse(t.isMany());
-        assertEquals(u, t.single());
+        assertEquals(d, t.single());
     }
 
     /**
-     * Test multiple target creation.
+     * Test creation of multiple targets using Target.many().
+     * The Target instance should behave as a multi-target container.
      */
     @Test
-    void multipleTargetWorks() {
-        Unit u1 = new DummyUnit("A");
-        Unit u2 = new DummyUnit("B");
+    void testManyTarget() {
+        Dummy d1 = new Dummy();
+        Dummy d2 = new Dummy();
 
-        Target t = Target.many(List.of(u1,u2));
+        Target t = Target.many(List.of(d1, d2));
 
+        // Verify multi-target behavior
         assertTrue(t.isMany());
         assertFalse(t.isSingle());
         assertEquals(2, t.many().size());
