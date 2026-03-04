@@ -6,7 +6,6 @@ import component.Unit;
 
 public abstract class Heroes extends Unit {
     private double shield=0;
-    private int aggro =0;
     private double atkMul = 1.0;
     private double atkFlat = 0.0;
     private int atkBuffTurns = 0; // later:
@@ -30,12 +29,6 @@ public abstract class Heroes extends Unit {
     public Integer getActionOrder() {
         return actionOrder;
     }
-
-    public void setAggro(int aggro) {
-        this.aggro = Math.max(0, aggro);
-    }
-
-    public int getAggro() { return aggro; }
 
     public void setShield(double shield) {
         this.shield = Math.max(0.0, shield);

@@ -25,7 +25,7 @@ public class MonsterFactory {
                 && team.get(1).getName().equals(team.get(2).getName())) {
             // บังคับให้ตัวสุดท้ายเปลี่ยนชนิด
             int forced = (rng.nextInt(2) + 1);
-            if (team.get(2).getName().equals("Slime")) forced = 2; // เปลี่ยนไป Crossaint
+            if (team.get(2).getName().equals("Type1")) forced = 2; // เปลี่ยนไป Crossaint
             Monster m = new Monster(forced);
             m.scaleToStage(stageCounter);
             team.set(2, m);
