@@ -57,7 +57,7 @@ public class Fighter extends Heroes implements Healing {
      * Uses the Fighter's ultimate ability.
      *
      * <p>Ultimate effect:
-     * Deals damage equal to 40% of the target's maximum HP.</p>
+     * Deals damage equal to 40% of the target's maximum HP + there attack.</p>
      *
      * @param target wrapper containing a single target
      */

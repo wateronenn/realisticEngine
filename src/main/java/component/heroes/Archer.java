@@ -40,7 +40,7 @@ public class Archer extends Heroes {
      * Constructs an Archer hero with predefined base stats and cooldown values.
      */
     public Archer() {
-        super("Archer",40,270,5);
+        super("Archer", 40, 270, 5);
         setHeroClass("Archer");
         setActionOrder(4);
         skillCdMax = 0;
@@ -76,15 +76,14 @@ public class Archer extends Heroes {
      *
      * <p>Ultimate effect:</p>
      * <ul>
-     *     <li>Computes total damage based on {@code bowStack}, effective attack,
-     *         and missing HP bonus</li>
+     *     <li>Computes total damage based on {@code bowStack}, effective attack</li>
      *     <li>Splits the total damage evenly among all selected targets</li>
      *     <li>Resets {@code bowStack} back to 1 after execution</li>
      * </ul>
      *
-     * <p>Damage formula (as implemented):</p>
+     * <p>Damage formula</p>
      * <pre>
-     * totalDamage = bowStack * effectiveAtk() * 0.7 + (100 - hpPercent) * 0.6
+     * totalDamage = bowStack * effectiveAtk()*( (10.00 + targets.size()) /10.00)
      * damagePerTarget = totalDamage / numberOfTargets
      * </pre>
      *
@@ -98,6 +97,7 @@ public class Archer extends Heroes {
             double dmgPerUnit = totaldmg/targets.size();
             attack(t,dmgPerUnit);
         }
+
         triggerUltCd();
         resetBow();
     }
@@ -141,7 +141,6 @@ public class Archer extends Heroes {
             }
 
             case SKILL -> {
-
                 skill(target);
             }
 
@@ -150,5 +149,4 @@ public class Archer extends Heroes {
             }
         }
     }
-
 }

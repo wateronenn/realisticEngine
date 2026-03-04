@@ -83,8 +83,8 @@ public class Caster extends Heroes implements Buffing {
     @Override
     public void ultimate(Target target) {
         var targets = target.many();
-        for(Unit unit:targets){
-            attack(unit,effectiveAtk()*0.9);
+        for (Unit unit : targets) {
+            attack(unit, effectiveAtk() * 0.9);
         }
         triggerUltCd();
     }
@@ -98,7 +98,7 @@ public class Caster extends Heroes implements Buffing {
      * @param target unit to buff (must be a Heroes instance)
      */
     @Override
-    public void buff(Unit target){
+    public void buff(Unit target) {
         if (target instanceof Heroes h) {
             h.applyAtkBuff(1.2, 0.0, 1);
         }

@@ -94,7 +94,6 @@ public class Monster extends Unit {
     public void scaleToStage(int stage) {
         int s = Math.max(1, stage);
 
-        // สเกลแบบ “คุมความยาก” แยกตามชนิด
         double hpScale, atkScale, defScale;
 
         if (type == 1) {          // Slime
@@ -110,6 +109,7 @@ public class Monster extends Unit {
             atkScale = Math.pow(1.12, s - 1);
             defScale = Math.pow(1.07, s - 1);
         }
+
 
         setMaxHp(Math.round(getMaxHp() * hpScale));
         setHp(getMaxHp());
