@@ -4,7 +4,6 @@ import application.Main;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -12,50 +11,82 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
 import logic.MusicPlayer;
 
+/**
+ * The {@code StartScene} class renders the main menu of the game.
+ *
+ * <p>This scene is the entry UI of the application. It is responsible for:</p>
+ * <ul>
+ *     <li>Resetting the game using {@link GameEngine#newGame()}</li>
+ *     <li>Setting the game state to {@link GameState#START_GAME}</li>
+ *     <li>Displaying the main menu background and logo</li>
+ *     <li>Providing a start button that navigates to {@link CharacterSelectionScene}</li>
+ * </ul>
+ *
+ * <p>UI behavior:</p>
+ * <ul>
+ *     <li>The start button is an image-based JavaFX button</li>
+ *     <li>Hovering applies glow and scale-up animation</li>
+ *     <li>Pressing applies a small "push down" translation</li>
+ * </ul>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class StartScene {
 
-    public static void showMenu(Stage stage,GameEngine gameEngine) {
+    /**
+     * Displays the main menu on the provided JavaFX stage.
+     *
+     * <p>This method resets and initializes the game state and constructs a fixed-size
+     * scene (1280 by 720) with a background image, logo, and start button.</p>
+     *
+     * <p>Navigation:</p>
+     * <ul>
+     *     <li>Start button opens {@link CharacterSelectionScene#show(Stage, GameEngine)}</li>
+     * </ul>
+     *
+     * @param stage the JavaFX stage where the menu scene will be displayed
+     * @param gameEngine the main game engine instance used for state and navigation
+     */
+    public static void showMenu(Stage stage, GameEngine gameEngine) {
         gameEngine.newGame();
         GameEngine.setGameState(GameState.START_GAME);
+
         VBox root = new VBox();
         MusicPlayer.playMusic(GameState.START_GAME);
 
         // ===== BACKGROUND =====
         Image bg = new Image(Main.class.getResource("/Background/Mainmenu.png").toExternalForm());
-
         BackgroundImage bgImage = new BackgroundImage(
                 bg,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(
-                        100, 100, true, true, true, true // IMPORTANT: scale background
+                        100, 100, true, true, true, true
                 )
         );
-
         root.setBackground(new Background(bgImage));
 
         // ===== CONTENT =====
         StackPane stack = new StackPane();
 
-        ImageView img1 = new ImageView(
+        ImageView logoView = new ImageView(
                 new Image(Main.class.getResource("/Sign/Logo.png").toExternalForm())
         );
-
-        img1.setFitWidth(750);
-        img1.setPreserveRatio(true);
+        logoView.setFitWidth(750);
+        logoView.setPreserveRatio(true);
 
         Button startBtn = createStartButton();
         startBtn.setOnAction(e -> CharacterSelectionScene.show(stage, gameEngine));
 
-        VBox content = new VBox( img1, startBtn);
+        VBox content = new VBox(logoView, startBtn);
         content.setAlignment(Pos.CENTER);
 
         stack.getChildren().add(content);
@@ -63,7 +94,7 @@ public class StartScene {
         root.getChildren().add(stack);
         root.setAlignment(Pos.TOP_CENTER);
 
-        Scene scene = new Scene(root, 1280, 720); // << fixed size
+        Scene scene = new Scene(root, 1280, 720);
 
         stage.setTitle("legend of Progmeth!");
         stage.setScene(scene);
@@ -71,9 +102,19 @@ public class StartScene {
         stage.show();
     }
 
+    /**
+     * Creates the main menu "Start" button as an image-based button with animations.
+     *
+     * <p>The returned button uses {@code /Button/Start.png} and applies:</p>
+     * <ul>
+     *     <li>Glow effect and scale animation on hover</li>
+     *     <li>Small translation on mouse press and release</li>
+     * </ul>
+     *
+     * @return a configured JavaFX {@link Button} that visually represents the start button
+     */
     public static Button createStartButton() {
 
-        // Load Image
         Image img = new Image(
                 StartScene.class.getResourceAsStream("/Button/Start.png")
         );
@@ -84,23 +125,19 @@ public class StartScene {
         imageView.setPreserveRatio(true);
         imageView.setSmooth(true);
 
-        // Create button with image
         Button startBtn = new Button();
         startBtn.setGraphic(imageView);
 
-        // Remove default button style
         startBtn.setStyle("""
             -fx-background-color: transparent;
             -fx-padding: 0;
             -fx-cursor: hand;
-            """);
+        """);
 
-        // Glow effect
         DropShadow glow = new DropShadow();
         glow.setColor(Color.BLACK);
         glow.setRadius(20);
 
-        // Hover Animation
         ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), startBtn);
         scaleUp.setToX(1.1);
         scaleUp.setToY(1.1);
@@ -119,7 +156,6 @@ public class StartScene {
             scaleDown.playFromStart();
         });
 
-        // Press Effect
         TranslateTransition pressDown = new TranslateTransition(Duration.millis(100), startBtn);
         pressDown.setToY(3);
 
