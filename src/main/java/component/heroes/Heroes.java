@@ -75,7 +75,7 @@ public abstract class Heroes extends Unit {
         setMaxHp(getMaxHp()+25);
         setHp(frac * getMaxHp());
 
-        setAtk(getAtk()+5);
+        setAtk(getAtk()+4);
         setDef(getDef()+1);
     }
     public void scale(){

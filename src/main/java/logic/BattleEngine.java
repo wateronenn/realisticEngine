@@ -86,8 +86,8 @@ public class BattleEngine {
             setBattleStage(BattleStage.HERO_RESOLVE_ACTION);
             resolveHeroAction(h, target, skill);
             afterHeroAction();
-            emitState(stage);
-            emitUpdate();
+            //emitState(stage);
+            //emitUpdate();
             return true;
 
         }
