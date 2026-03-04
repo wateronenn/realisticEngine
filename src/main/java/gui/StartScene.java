@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 
 /**
  * The {@code StartScene} class renders the main menu of the game.
@@ -58,6 +59,7 @@ public class StartScene {
         GameEngine.setGameState(GameState.START_GAME);
 
         VBox root = new VBox();
+        MusicPlayer.playMusic(GameState.START_GAME);
 
         // ===== BACKGROUND =====
         Image bg = new Image(Main.class.getResource("/Background/Mainmenu.png").toExternalForm());

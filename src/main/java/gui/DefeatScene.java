@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 
 /**
  * The {@code DefeatScene} class renders the defeat screen shown when the player loses a battle.
@@ -49,6 +50,7 @@ public class DefeatScene {
      */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.DEFEAT);
+        MusicPlayer.playMusic(GameState.DEFEAT);
 
         VBox root = new VBox();
         root.setPadding(new Insets(40));

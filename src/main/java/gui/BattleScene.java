@@ -1180,6 +1180,7 @@ public class BattleScene {
         engine = new BattleEngine(model);
         GAMEENGINE = gameEngine;
         STAGE = stage;
+        MusicPlayer.playMusic(GameState.BATTLE);
 
         AnchorPane root = new AnchorPane();
         root.setPadding(new Insets(8));

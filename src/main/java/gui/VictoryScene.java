@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 
 /**
  * The {@code VictoryScene} class displays the victory screen after the player wins a battle.
@@ -65,6 +66,7 @@ public class VictoryScene {
      */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.VICTORY);
+        MusicPlayer.playMusic(GameState.VICTORY);
 
         VBox root = new VBox();
         root.setPadding(new Insets(133, 0, 0, 0));
