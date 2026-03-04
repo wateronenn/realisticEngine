@@ -30,7 +30,7 @@ public class Caster extends Heroes implements Buffing {
     public void ultimate(Target target) {
         var targets = target.many();
         for(Unit unit:targets){
-            attack(unit,effectiveAtk()*0.8);
+            attack(unit,effectiveAtk()*0.9);
         }
         triggerUltCd();
     }

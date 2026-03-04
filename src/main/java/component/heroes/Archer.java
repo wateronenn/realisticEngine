@@ -9,7 +9,7 @@ public class Archer extends Heroes {
 
     public Archer(){
 
-        super("Archer",50,270,5);
+        super("Archer",40,270,5);
         setHeroClass("Archer");
         setActionOrder(4);
         skillCdMax = 0;
