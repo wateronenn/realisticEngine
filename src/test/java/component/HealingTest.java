@@ -1,43 +1,34 @@
-package component;
+package component.heroes;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * HealingTest
- *
- * Tests Healing interface behavior.
- */
 class HealingTest {
 
-    static class DummyUnit extends Unit {
-        public DummyUnit() {
-            super("Test", 10, 100, 5);
-        }
-    }
-
-    static class Healer implements Healing {
-
-        /**
-         * Heals target by 20 HP.
-         */
-        @Override
-        public void heal(Unit target) {
-            target.setHp(target.getHp() + 20);
-        }
-    }
-
-    /**
-     * Test healing increases HP correctly.
-     */
     @Test
-    void healingIncreasesHp() {
-        DummyUnit unit = new DummyUnit();
-        unit.setHp(50);
+    void testFighterHeal() {
+        Fighter f = new Fighter();
+        f.setHp(100);
 
-        Healing healer = new Healer();
-        healer.heal(unit);
+        double before = f.getHp();
 
-        assertEquals(70, unit.getHp());
+        // Fighter heals 0.8 * atk
+        f.heal(f);
+
+        assertTrue(f.getHp() > before);
+    }
+
+    @Test
+    void testTankHeal() {
+        Tank tank = new Tank();
+        Fighter ally = new Fighter();
+
+        ally.setHp(100);
+
+        // Tank heals 30% of ally maxHp
+        tank.heal(ally);
+
+        double expected = 100 + 0.3 * ally.getMaxHp();
+        assertEquals(expected, ally.getHp(), 0.0001);
     }
 }

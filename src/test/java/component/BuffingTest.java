@@ -1,42 +1,32 @@
-package component;
+package component.heroes;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * BuffingTest
- *
- * Tests Buffing interface behavior.
- */
 class BuffingTest {
 
-    static class DummyUnit extends Unit {
-        public DummyUnit() {
-            super("Test", 10, 100, 5);
-        }
-    }
-
-    static class Buffer implements Buffing {
-
-        /**
-         * Increases attack by 10.
-         */
-        @Override
-        public void buff(Unit unit) {
-            unit.setAtk(unit.getAtk() + 10);
-        }
-    }
-
-    /**
-     * Test buff increases attack value.
-     */
     @Test
-    void buffIncreasesAttack() {
-        DummyUnit unit = new DummyUnit();
-        Buffing buffer = new Buffer();
+    void testCasterBuffIncreaseAtk() {
+        Caster caster = new Caster();
+        Fighter target = new Fighter();
 
-        buffer.buff(unit);
+        double before = target.getAtkMul();
 
-        assertEquals(20, unit.getAtk());
+        // Caster buff applies 1.2 multiplier
+        caster.buff(target);
+
+        assertTrue(target.getAtkMul() > before);
+        assertEquals(1.2, target.getAtkMul(), 0.0001);
+    }
+
+    @Test
+    void testTankBuffIncreaseAtk() {
+        Tank tank = new Tank();
+        Fighter target = new Fighter();
+
+        tank.buff(target);
+
+        // Tank buff applies 1.1 multiplier
+        assertEquals(1.1, target.getAtkMul(), 0.0001);
     }
 }

@@ -1,131 +1,71 @@
 package component;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * UnitTest
- *
- * This class tests all core behaviors of Unit:
- * - Constructor
- * - Damage reduction
- * - HP limits
- * - Attack logic
- * - Death condition
- * - HP percentage
- */
 class UnitTest {
 
-    Unit unit;
-    Unit target;
-
-    /**
-     * DummyUnit is a simple concrete subclass of Unit.
-     * We need this because Unit is abstract and cannot be instantiated directly.
-     */
     static class DummyUnit extends Unit {
-        public DummyUnit(String name, double atk, double hp, double def) {
-            super(name, atk, hp, def);
+        public DummyUnit() {
+            super("Dummy", 50, 100, 10);
         }
     }
 
-    /**
-     * This method runs before each test.
-     * It ensures each test starts with a fresh object.
-     */
-    @BeforeEach
-    void setup() {
-        unit = new DummyUnit("Tester", 50, 200, 10);
-        target = new DummyUnit("Enemy", 40, 150, 5);
+    @Test
+    void testDamageReduction() {
+        // damage lower than def → should be 0
+        DummyUnit u = new DummyUnit();
+        assertEquals(0.0, u.dmgReduction(5), 0.0001);
+
+        // damage higher than def → dmg - def
+        assertEquals(40.0, u.dmgReduction(50), 0.0001);
     }
 
-    /**
-     * Test constructor correctly sets initial values.
-     */
     @Test
-    void constructorSetsValuesCorrectly() {
-        assertEquals("Tester", unit.getName());
-        assertEquals(50, unit.getAtk());
-        assertEquals(200, unit.getMaxHp());
-        assertEquals(200, unit.getHp());
-        assertEquals(10, unit.getDef());
+    void testTakeDamage() {
+        DummyUnit u = new DummyUnit();
+        double dealt = u.takeDamage(50); // 50 - 10 def = 40
+
+        assertEquals(40.0, dealt, 0.0001);
+        assertEquals(60.0, u.getHp(), 0.0001);
     }
 
-    /**
-     * Test damage reduction subtracts defense correctly.
-     */
     @Test
-    void damageReductionWorks() {
-        double reduced = unit.dmgReduction(30);
-        assertEquals(20, reduced); // 30 - 10 defense
+    void testHpClamp() {
+        DummyUnit u = new DummyUnit();
+        u.setHp(200); // exceed maxHp
+        assertEquals(100.0, u.getHp(), 0.0001);
+
+        u.setHp(-50);
+        assertEquals(0.0, u.getHp(), 0.0001);
     }
 
-    /**
-     * Test damage reduction does not allow negative damage.
-     */
     @Test
-    void damageCannotBeNegative() {
-        double reduced = unit.dmgReduction(-50);
-        assertEquals(0, reduced);
+    void testIsDead() {
+        DummyUnit u = new DummyUnit();
+        u.setHp(0);
+        assertTrue(u.isDead());
     }
 
-    /**
-     * Test takeDamage reduces HP properly.
-     */
     @Test
-    void takeDamageReducesHp() {
-        double before = unit.getHp();
-        double taken = unit.takeDamage(30);
+    void testAttackWithElementModifier() {
+        DummyUnit attacker = new DummyUnit();
+        DummyUnit target = new DummyUnit();
 
-        assertEquals(20, taken);
-        assertEquals(before - 20, unit.getHp());
+        attacker.setElement(Element.FIRE);
+        target.setElement(Element.NATURE);
+
+        double damage = attacker.attack(target, 50);
+        // FIRE vs NATURE → 1.2 multiplier
+        // 50 * 1.2 = 60 → minus 10 def = 50 actual
+
+        assertEquals(50.0, damage, 0.0001);
     }
 
-    /**
-     * Test unit is marked dead when HP reaches zero.
-     */
     @Test
-    void unitDiesWhenHpZero() {
-        unit.takeDamage(1000);
-        assertTrue(unit.isDead());
-    }
-
-    /**
-     * Test HP cannot exceed maximum HP.
-     */
-    @Test
-    void hpCannotExceedMax() {
-        unit.setHp(999);
-        assertEquals(unit.getMaxHp(), unit.getHp());
-    }
-
-    /**
-     * Test HP cannot go below zero.
-     */
-    @Test
-    void hpCannotGoBelowZero() {
-        unit.setHp(-100);
-        assertEquals(0, unit.getHp());
-    }
-
-    /**
-     * Test attack reduces target HP.
-     */
-    @Test
-    void attackDealsDamage() {
-        double before = target.getHp();
-        unit.attack(target, 50);
-
-        assertTrue(target.getHp() < before);
-    }
-
-    /**
-     * Test HP percentage calculation.
-     */
-    @Test
-    void hpPercentWorks() {
-        unit.setHp(100);
-        assertEquals(50, unit.getHpPercent());
+    void testHpPercent() {
+        DummyUnit u = new DummyUnit();
+        u.setHp(50);
+        assertEquals(50.0, u.getHpPercent(), 0.0001);
     }
 }

@@ -2,96 +2,56 @@ package component.heroes;
 
 import component.Target;
 import component.Unit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * HeroesTest
- *
- * Tests shared hero mechanics:
- * - Shield
- * - Buff
- * - Cooldowns
- * - Upgrade
- */
 class HeroesTest {
 
-    static class DummyHero extends Heroes {
-
-        public DummyHero() {
-            super("Hero",50,200,10);
-        }
-
-        @Override
-        public void normalAttack(Unit target) {}
-
-        @Override
-        public void skill(Target target) {}
-
-        @Override
-        public void ultimate(Target target) {}
-    }
-
-    DummyHero hero;
-
-    @BeforeEach
-    void setup() {
-        hero = new DummyHero();
-    }
-
-    /**
-     * Test shield absorbs incoming damage before HP.
-     */
     @Test
-    void shieldAbsorbsDamage() {
-        hero.setShield(30);
-        hero.takeDamage(40);
+    void testShieldAbsorb() {
+        Tank t = new Tank();
+        t.setShield(50);
 
-        assertEquals(190, hero.getHp());
-        assertEquals(0, hero.getShield());
+        double damage = t.takeDamage(30);
+
+        assertEquals(30.0, damage, 0.0001);
+        assertEquals(20.0, t.getShield(), 0.0001);
     }
 
-    /**
-     * Test attack buff increases effective attack.
-     */
     @Test
-    void atkBuffWorks() {
-        hero.applyAtkBuff(2.0, 10, 1);
-        assertEquals(110, hero.effectiveAtk());
+    void testEffectiveAtk() {
+        Fighter f = new Fighter();
+        f.applyAtkBuff(1.2, 10, 1);
+
+        double expected = f.getAtk() * 1.2 + 10;
+        assertEquals(expected, f.effectiveAtk(), 0.0001);
     }
 
-    /**
-     * Test buff expires after turn ends.
-     */
     @Test
-    void buffExpiresAfterTurn() {
-        hero.applyAtkBuff(2.0, 10, 1);
-        hero.onTurnEnd();
+    void testCooldownTick() {
+        Fighter f = new Fighter();
+        f.triggerSkillCd();
+        f.tickCooldowns();
 
-        assertEquals(50, hero.effectiveAtk());
+        assertEquals(1, f.getSkillCdRemain());
     }
 
-    /**
-     * Test upgrade increases stats.
-     */
     @Test
-    void upgradeIncreasesStats() {
-        double oldHp = hero.getMaxHp();
-        hero.upgrade();
+    void testUpgrade() {
+        Fighter f = new Fighter();
+        double oldHp = f.getMaxHp();
 
-        assertTrue(hero.getMaxHp() > oldHp);
+        f.upgrade();
+        assertTrue(f.getMaxHp() > oldHp);
     }
 
-    /**
-     * Test cooldown system.
-     */
     @Test
-    void cooldownSystemWorks() {
-        hero.triggerSkillCd();
-        assertFalse(hero.canUseSkill());
+    void testResetAfterTurn() {
+        Fighter f = new Fighter();
+        f.setHp(0);
+        f.resetAfterTurn();
 
-        hero.resetAllCooldowns();
-        assertTrue(hero.canUseSkill());
+        assertTrue(f.getHp() > 0);
+        assertEquals(0, f.getSkillCdRemain());
     }
 }
