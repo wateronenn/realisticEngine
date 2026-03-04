@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 
 public class StartScene {
 
@@ -24,6 +25,7 @@ public class StartScene {
         gameEngine.newGame();
         GameEngine.setGameState(GameState.START_GAME);
         VBox root = new VBox();
+        MusicPlayer.playMusic(GameState.START_GAME);
 
         // ===== BACKGROUND =====
         Image bg = new Image(Main.class.getResource("/Background/Mainmenu.png").toExternalForm());
