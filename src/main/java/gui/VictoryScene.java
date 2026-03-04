@@ -62,7 +62,7 @@ public class VictoryScene {
             ImageView charImg = createCharacterImage(base + h.getName() + "Icon.PNG");
 
             Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-            Text scale = new Text("HP :  before > after\nATK : before > after\nDEF : before > after\n");
+            Text scale = new Text("HP  ->  " + (int)Math.floor(h.getHp() * 1.1) + "\nATK  ->  " + (int)Math.floor(h.getAtk() * 1.1) + "\nDEF  ->  " + (int)Math.floor(h.getDef() + 1) + "\n");
             scale.setFont(font2);
             scale.setLineSpacing(8);
 

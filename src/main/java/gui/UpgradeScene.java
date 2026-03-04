@@ -22,6 +22,9 @@ import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+
 public class UpgradeScene {
 
     private static Runnable resetCurrentSelection = null;
@@ -74,7 +77,7 @@ public class UpgradeScene {
             Button charBtn = createCharacterButton(base + h.getName() + "Icon.PNG",h);
 
             Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-            Text scale = new Text("HP :  before > after\nATK : before > after\nDEF : before > after\n");
+            Text scale = new Text("HP  ->  " + (int)Math.floor((h.getHp() * 1.1) + 25) + "\nATK  ->  " + (int)Math.floor((h.getAtk() * 1.1) + 4) + "\nDEF  ->  " + (int)Math.floor((h.getDef() + 1) + 1) + "\n");
             scale.setFont(font2);
             scale.setLineSpacing(8);
 
