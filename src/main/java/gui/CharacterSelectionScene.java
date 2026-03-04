@@ -23,10 +23,10 @@ import logic.GameState;
 public class CharacterSelectionScene {
 
     private static Runnable resetCurrentSelection = null;
-    private static String discription[][] = {{"Caster","HP :\nATK :\nDEF :","Skill – Arcane Pulse","Deal light magic damage and empower self.","Ult – Arcane Cataclysm","Blast all enemies with devastating magic."},
-                                            {"Archer","HP :\nATK :\nDEF :","Skill – Arrow Stock","Add 1 arrow to the quiver.","Ult – Arrow Rain","Unleash all stored arrows, dealing massive AoE damage."},
-                                            {"Tank","HP :\nATK :\nDEF :","Skill – Guardian’s Mend","Restore HP to a selected ally.","Ult – Aegis Command","Grant shields and boost all allies."},
-                                            {"Fighter","HP :\nATK :\nDEF :","Skill – Lifesteal Strike","Attack an enemy and recover HP.","Ult – Execution Breaker","Ignore all defense and deal massive true damage."}
+    private static String discription[][] = {{"Caster","HP : 260\nATK : 50\nDEF : 5","Skill – Arcane Pulse","Deal light magic damage and empower self.","Ult – Arcane Cataclysm","Blast all enemies with devastating magic."},
+                                            {"Archer","HP : 270\nATK : 40\nDEF : 5","Skill – Arrow Stock","Add 1 arrow to the quiver.","Ult – Arrow Rain","Unleash all stored arrows, dealing massive AoE damage."},
+                                            {"Tank","HP : 480\nATK : 20\nDEF : 15","Skill – Guardian’s Mend","Restore HP to a selected ally.","Ult – Aegis Command","Grant shields and boost all allies."},
+                                            {"Fighter","HP : 350\nATK : 40 \nDEF : 9","Skill – Lifesteal Strike","Attack an enemy and recover HP.","Ult – Execution Breaker","Ignore all defense and deal massive true damage."}
     };
 
     public static void show(Stage stage, GameEngine gameEngine) {
