@@ -17,7 +17,6 @@ public abstract class Unit {
         setMaxHp(maxHp);
         setHp(maxHp);
         setDef(def);
-        setElement(element);
     }
 
     public void setElement(Element element) {
