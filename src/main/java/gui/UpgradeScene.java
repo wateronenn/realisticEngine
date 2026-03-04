@@ -25,11 +25,64 @@ import logic.GameState;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 
+/**
+ * The {@code UpgradeScene} class renders the hero upgrade screen that appears after victory.
+ *
+ * <p>This scene allows the player to select exactly one hero from the current team and apply
+ * an upgrade (via {@link GameEngine#upgradingHero()}). The upgraded hero is stored in
+ * {@link GameEngine#getUpgradeHero()}.</p>
+ *
+ * <p>Main responsibilities:</p>
+ * <ul>
+ *     <li>Set the game state to {@link GameState#UPGRADE}</li>
+ *     <li>Reset the current upgrade selection</li>
+ *     <li>Display selectable hero icons from {@link GameEngine#getHeroTEAM()}</li>
+ *     <li>Highlight the currently selected hero (glow + scale animation)</li>
+ *     <li>Apply upgrade and navigate to {@link RollElementScene} when Next is clicked</li>
+ * </ul>
+ *
+ * <p>Selection rules:</p>
+ * <ul>
+ *     <li>Only one hero can be selected at a time</li>
+ *     <li>Clicking the same hero again will unselect it</li>
+ *     <li>Selecting a new hero will automatically clear the previous selection</li>
+ * </ul>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class UpgradeScene {
 
+    /**
+     * Stores a runnable that resets the previously selected hero button.
+     *
+     * <p>This is used to enforce single-selection behavior without a {@code ToggleGroup}.</p>
+     */
     private static Runnable resetCurrentSelection = null;
+
+    /**
+     * Shows the upgrade scene on the given stage.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *     <li>Sets the game state to {@link GameState#UPGRADE}</li>
+     *     <li>Clears any previously selected upgrade hero</li>
+     *     <li>Builds the UI layout with background, hero selection, and Next button</li>
+     *     <li>Disables window resizing and enforces fixed size (1280 by 720)</li>
+     * </ul>
+     *
+     * <p>Navigation:</p>
+     * <ul>
+     *     <li>Back button goes to {@link VictoryScene#show(Stage, GameEngine)}</li>
+     *     <li>Next button upgrades the selected hero and goes to {@link RollElementScene#show(Stage, GameEngine)}</li>
+     * </ul>
+     *
+     * @param stage the JavaFX stage used to display this scene
+     * @param gameEngine the main game engine instance used for state and navigation
+     */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.UPGRADE);
+
         VBox root = new VBox();
         root.setSpacing(70);
         root.setPadding(new Insets(10));
@@ -44,9 +97,7 @@ public class UpgradeScene {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
-                new BackgroundSize(
-                        100, 100, true, true, true, true // IMPORTANT: scale background
-                )
+                new BackgroundSize(100, 100, true, true, true, true)
         );
         root.setBackground(new Background(bgImage));
 
@@ -57,7 +108,11 @@ public class UpgradeScene {
         HBox topBar = new HBox(backBtn);
         topBar.setAlignment(Pos.TOP_LEFT);
 
-        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),30);
+        // Title
+        Font font1 = Font.loadFont(
+                CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),
+                30
+        );
         Text title = new Text("Dragon's  blessing");
         title.setFont(font1);
 
@@ -74,7 +129,7 @@ public class UpgradeScene {
             slot.setSpacing(20);
 
             String base = "/Heroes/" + h.getName() + "/";
-            Button charBtn = createCharacterButton(base + h.getName() + "Icon.PNG",h);
+            Button charBtn = createCharacterButton(base + h.getName() + "Icon.PNG", h);
 
             Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
             Text scale = new Text("HP  ->  " + (int)Math.floor((h.getHp() * 1.1) + 25) + "\nATK  ->  " + (int)Math.floor((h.getAtk() * 1.1) + 4) + "\nDEF  ->  " + (int)Math.floor((h.getDef() + 1) + 1) + "\n");
@@ -107,7 +162,23 @@ public class UpgradeScene {
         stage.show();
     }
 
-    public static Button createCharacterButton(String imagePath1,Heroes hero) {
+    /**
+     * Creates a selectable hero icon button for upgrade selection.
+     *
+     * <p>Behavior:</p>
+     * <ul>
+     *     <li>Click once: selects this hero for upgrade, applies glow, and scales up</li>
+     *     <li>Click again: unselects, removes glow, and resets scale</li>
+     *     <li>Selecting a different hero automatically resets the previous selection</li>
+     * </ul>
+     *
+     * <p>Selection is stored in {@link GameEngine#setUpgradeHero(Heroes)}.</p>
+     *
+     * @param imagePath1 resource path for the hero icon image
+     * @param hero the hero represented by this button
+     * @return a clickable JavaFX {@link Button} representing the hero selection
+     */
+    public static Button createCharacterButton(String imagePath1, Heroes hero) {
 
         DropShadow shadow = new DropShadow();
         shadow.setRadius(40);
@@ -205,6 +276,14 @@ public class UpgradeScene {
         return btn;
     }
 
+    /**
+     * Creates an image-based button with hover scaling, glow effect, and press animation.
+     *
+     * <p>This is a reusable UI helper for scene navigation buttons (Back, Next, etc.).</p>
+     *
+     * @param path the resource path of the button image
+     * @return a styled JavaFX {@link Button}
+     */
     private static Button createButton(String path) {
 
         Image img = new Image(CharacterSelectionScene.class.getResourceAsStream(path));
@@ -257,6 +336,18 @@ public class UpgradeScene {
         return btn;
     }
 
+    /**
+     * Handles the "Next" button action for upgrading a hero.
+     *
+     * <p>If no hero is selected, an error dialog is shown and the method returns {@code false}.</p>
+     *
+     * <p>If a hero is selected, {@link GameEngine#upgradingHero()} is executed and the scene transitions
+     * to {@link RollElementScene#show(Stage, GameEngine)}. The method returns {@code true}.</p>
+     *
+     * @param stage the JavaFX stage used for navigation
+     * @param gameEngine the main game engine instance
+     * @return {@code true} if upgrade was applied and navigation occurred, otherwise {@code false}
+     */
     private static boolean nextBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
         if (gameEngine.getUpgradeHero() == null) {
             Alert nullUpgrdeAlert = new Alert(Alert.AlertType.ERROR);

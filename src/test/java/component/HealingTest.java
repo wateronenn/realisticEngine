@@ -1,5 +1,7 @@
 package component.heroes;
 
+import component.heroes.Fighter;
+import component.heroes.Tank;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

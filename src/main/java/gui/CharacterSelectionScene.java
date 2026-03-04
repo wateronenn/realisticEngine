@@ -20,15 +20,73 @@ import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
 
+/**
+ * The {@code CharacterSelectionScene} class renders the team selection screen.
+ *
+ * <p>This scene allows the player to:</p>
+ * <ul>
+ *     <li>View available heroes from {@link GameEngine#getAvailableHeroes()}</li>
+ *     <li>Select and deselect heroes into the team (up to 3 members)</li>
+ *     <li>View hero preview information (name, stats label, skill, and ultimate description)</li>
+ *     <li>Proceed to the next scene when the team is complete</li>
+ * </ul>
+ *
+ * <p>Selection behavior:</p>
+ * <ul>
+ *     <li>Clicking a hero portrait toggles an information view for that hero</li>
+ *     <li>Only one hero information view can be expanded at a time</li>
+ *     <li>Clicking the "Choose" button toggles hero membership in the team</li>
+ * </ul>
+ *
+ * <p>This class is designed as a static scene utility with helper methods
+ * for building interactive image-based buttons.</p>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class CharacterSelectionScene {
 
+    /**
+     * A callback used to reset the currently expanded hero portrait, ensuring that
+     * only one hero information panel is expanded at a time.
+     */
     private static Runnable resetCurrentSelection = null;
+
+    /**
+     * Static text data used to display hero details in the portrait scroll overlay.
+     *
+     * <p>Each row corresponds to one hero, and columns are:</p>
+     * <ul>
+     *     <li>0: hero name</li>
+     *     <li>1: stats placeholder text</li>
+     *     <li>2: skill name label</li>
+     *     <li>3: skill description</li>
+     *     <li>4: ultimate name label</li>
+     *     <li>5: ultimate description</li>
+     * </ul>
+     *
+     * <p>Note: values are currently placeholders for HP, ATK, and DEF.</p>
+     */
     private static String discription[][] = {{"Caster","HP : 260\nATK : 50\nDEF : 5","Skill – Arcane Pulse","Deal light magic damage and empower self.","Ult – Arcane Cataclysm","Blast all enemies with devastating magic."},
                                             {"Archer","HP : 270\nATK : 40\nDEF : 5","Skill – Arrow Stock","Add 1 arrow to the quiver.","Ult – Arrow Rain","Unleash all stored arrows, dealing massive AoE damage."},
                                             {"Tank","HP : 480\nATK : 20\nDEF : 15","Skill – Guardian’s Mend","Restore HP to a selected ally.","Ult – Aegis Command","Grant shields and boost all allies."},
                                             {"Fighter","HP : 350\nATK : 40 \nDEF : 9","Skill – Lifesteal Strike","Attack an enemy and recover HP.","Ult – Execution Breaker","Ignore all defense and deal massive true damage."}
     };
 
+    /**
+     * Displays the character selection scene on the provided stage.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *     <li>Sets the game state to {@link GameState#SELECT_TEAM}</li>
+     *     <li>Builds the background and main layout</li>
+     *     <li>Creates hero portrait buttons and "Choose" buttons for team selection</li>
+     *     <li>Creates a start button that proceeds only when the team is full</li>
+     * </ul>
+     *
+     * @param stage the JavaFX stage where this scene is shown
+     * @param gameEngine the main game engine instance used for navigation and state
+     */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.SELECT_TEAM);
         VBox root = new VBox();
@@ -44,7 +102,7 @@ public class CharacterSelectionScene {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(
-                        100, 100, true, true, true, true // IMPORTANT: scale background
+                        100, 100, true, true, true, true
                 )
         );
         root.setBackground(new Background(bgImage));
@@ -107,6 +165,15 @@ public class CharacterSelectionScene {
         stage.show();
     }
 
+    /**
+     * Handles the Start button click.
+     *
+     * <p>If the team is full (exactly 3 heroes), this proceeds to the roll element scene.
+     * Otherwise, an error alert is shown to the player.</p>
+     *
+     * @param stage the current JavaFX stage
+     * @param gameEngine the game engine used to validate team size and navigate to the next scene
+     */
     private static void startBtnOnClickHandler(Stage stage, GameEngine gameEngine) {
         if (gameEngine.checkFullTeam()) {
             RollElementScene.show(stage, gameEngine);
@@ -119,6 +186,19 @@ public class CharacterSelectionScene {
         }
     }
 
+    /**
+     * Handles the Choose or Discard button behavior for a specific hero.
+     *
+     * <p>This method toggles hero membership in the team via
+     * {@link GameEngine#toggleTeamMember(Heroes)} and updates the button graphic accordingly.</p>
+     *
+     * <p>If adding the hero would exceed the maximum team size, an error alert is shown
+     * and the selection change is not applied.</p>
+     *
+     * @param gameEngine the game engine used to manage team membership
+     * @param hero the hero to be toggled in or out of the team
+     * @param pickBtn the button whose image is updated to reflect current selection state
+     */
     private static void pickBtnOnClickHandler(GameEngine gameEngine, Heroes hero, Button pickBtn) {
 
         boolean checkAddTeamMember = GameEngine.toggleTeamMember(hero);
@@ -147,8 +227,26 @@ public class CharacterSelectionScene {
         }
     }
 
-    public static Button createCharacterButton (String imagePath1, String imagePath2, int index){
-      
+    /**
+     * Creates a clickable hero portrait button that can expand into an information panel.
+     *
+     * <p>Behavior:</p>
+     * <ul>
+     *     <li>Hover: temporarily swaps to an attack image if the button is not selected</li>
+     *     <li>Click: toggles selection and shows a scroll overlay containing hero descriptions</li>
+     *     <li>Only one hero button can be expanded at a time using {@link #resetCurrentSelection}</li>
+     * </ul>
+     *
+     * <p>The expanded view uses a scroll image as background and overlays
+     * text from {@link #discription} using the provided index.</p>
+     *
+     * @param imagePath1 resource path for the hero idle image
+     * @param imagePath2 resource path for the hero attack image
+     * @param index index used to select text from {@link #discription}
+     * @return a configured JavaFX {@link Button} representing a hero portrait
+     */
+    public static Button createCharacterButton(String imagePath1, String imagePath2, int index) {
+
         DropShadow shadow = new DropShadow();
         shadow.setRadius(40);
         shadow.setSpread(0.4);
@@ -164,8 +262,8 @@ public class CharacterSelectionScene {
 
         Image img3 = new Image(CharacterSelectionScene.class.getResourceAsStream("/Sign/Scroll.png"));
         ImageView iv3 = new ImageView(img3);
-      
-        int[] fit = {350,350,300};
+
+        int[] fit = {350, 350, 300};
         ImageView[] views = {iv1, iv2, iv3};
         for (int i = 0; i < 3; i++) {
             views[i].setFitWidth(fit[i]);
@@ -174,10 +272,11 @@ public class CharacterSelectionScene {
             views[i].setSmooth(true);
             views[i].setEffect(shadow);
         }
-      
-        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-        Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),10);
-        Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),8);
+
+        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(), 15);
+        Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(), 10);
+        Font font3 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(), 8);
+
         Text name = new Text(discription[index][0]);
         name.setWrappingWidth(fit[2] * 0.65);
         name.setFont(font1);
@@ -270,6 +369,18 @@ public class CharacterSelectionScene {
         return btn;
     }
 
+    /**
+     * Creates a generic image-based button used in the selection UI.
+     *
+     * <p>This button supports:</p>
+     * <ul>
+     *     <li>Hover glow with scale-up animation</li>
+     *     <li>Press and release translate animation to simulate a click</li>
+     * </ul>
+     *
+     * @param path resource path to the button image
+     * @return a styled JavaFX {@link Button} with hover and press animations
+     */
     private static Button createButton(String path) {
 
         Image img = new Image(CharacterSelectionScene.class.getResourceAsStream(path));
