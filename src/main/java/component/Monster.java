@@ -27,18 +27,18 @@ public class Monster extends Unit {
 
     private void applyBaseStats() {
         if (type == 1) {          // Slime
-            setAtk(30);
-            setMaxHp(370);
+            setAtk(35);
+            setMaxHp(420);
             setHp(getMaxHp());
             setDef(8);
         } else if (type == 2) {   // Crossaint
-            setAtk(38);
-            setMaxHp(270);
+            setAtk(50);
+            setMaxHp(300);
             setHp(getMaxHp());
             setDef(5);
         } else {                  // Cabbage
-            setAtk(30);
-            setMaxHp(320);
+            setAtk(35);
+            setMaxHp(340);
             setHp(getMaxHp());
             setDef(10);
         }
@@ -51,15 +51,15 @@ public class Monster extends Unit {
 
         if (type == 1) {          // Slime
             hpScale  = Math.pow(1.13, s - 1);
-            atkScale = Math.pow(1.07, s - 1);
+            atkScale = Math.pow(1.12, s - 1);
             defScale = Math.pow(1.05, s - 1);
         } else if (type == 2) {   // Crossaint
-            hpScale  = Math.pow(1.08, s - 1);
-            atkScale = Math.pow(1.12, s - 1);
+            hpScale  = Math.pow(1.11, s - 1);
+            atkScale = Math.pow(1.14, s - 1);
             defScale = Math.pow(1.04, s - 1);
         } else {                  // Cabbage
-            hpScale  = Math.pow(1.1, s - 1);
-            atkScale = Math.pow(1.1, s - 1);
+            hpScale  = Math.pow(1.12, s - 1);
+            atkScale = Math.pow(1.12, s - 1);
             defScale = Math.pow(1.06, s - 1);
         }
 
