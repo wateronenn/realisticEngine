@@ -2,9 +2,86 @@
 
 Legends of ProgMeth is a **turn-based strategy RPG** developed using **Java and JavaFX**.  
 Players assemble a team of heroes and battle progressively stronger monsters through strategic skill usage, cooldown management, and elemental advantages.
+---
+.jar file is in Release page (right side) !!
+---
+# How to Run the Project
+
+## Requirements
+
+- Java **17 or newer**
+- Gradle
 
 ---
 
+## Run with Gradle
+
+### Windows
+
+```
+gradlew run
+```
+
+### Mac / Linux
+
+```
+./gradlew run
+```
+
+---
+
+# VM Setup (Course Environment)
+
+To ensure the project runs correctly on the course virtual machine.
+
+## Install Java
+
+```
+sudo apt update
+sudo apt install openjdk-17-jdk
+```
+
+Verify installation:
+
+```
+java -version
+```
+
+---
+
+## Install JavaFX
+
+```
+sudo apt install openjfx
+```
+
+---
+
+## Clone the Repository
+
+```
+git clone <repository-url>
+cd LegendsOfProgMeth
+```
+
+---
+
+## Run the Game
+
+```
+./gradlew run
+```
+---
+## Gradle JVM Graphics Configuration
+```
+application {
+    applicationDefaultJvmArgs = [
+        "-Dprism.order=es2,sw",
+        "-Dprism.verbose=true"
+    ]
+}
+```
+---
 # Game Overview
 
 Legends of ProgMeth is a turn-based combat game where players choose heroes and fight monsters across multiple stages.
@@ -115,83 +192,7 @@ Monster types:
 Each stage increases monster stats through scaling formulas.
 
 ---
-# How to Run the Project
 
-## Requirements
-
-- Java **17 or newer**
-- Gradle
-
----
-
-## Run with Gradle
-
-### Windows
-
-```
-gradlew run
-```
-
-### Mac / Linux
-
-```
-./gradlew run
-```
-
----
-
-# VM Setup (Course Environment)
-
-To ensure the project runs correctly on the course virtual machine.
-
-## Install Java
-
-```
-sudo apt update
-sudo apt install openjdk-17-jdk
-```
-
-Verify installation:
-
-```
-java -version
-```
-
----
-
-## Install JavaFX
-
-```
-sudo apt install openjfx
-```
-
----
-
-## Clone the Repository
-
-```
-git clone <repository-url>
-cd LegendsOfProgMeth
-```
-
----
-
-## Run the Game
-
-```
-./gradlew run
-```
----
-## Gradle JVM Graphics Configuration
-```
-application {
-    applicationDefaultJvmArgs = [
-        "-Dprism.order=es2,sw",
-        "-Dprism.verbose=true"
-    ]
-}
-```
----
 
 # Controls
 
