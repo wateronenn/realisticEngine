@@ -18,13 +18,58 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 
+/**
+ * The {@code VictoryScene} class displays the victory screen after the player wins a battle.
+ *
+ * <p>This scene serves as a transition screen that shows the current hero team and then allows
+ * the player to proceed to the upgrade screen.</p>
+ *
+ * <p>Main responsibilities:</p>
+ * <ul>
+ *     <li>Set the game state to {@link GameState#VICTORY}</li>
+ *     <li>Clear any previously selected upgrade hero via {@link GameEngine#setUpgradeHero(Heroes)}</li>
+ *     <li>Render a victory background and a title</li>
+ *     <li>Display the current hero team icons from {@link GameEngine#getHeroTEAM()}</li>
+ *     <li>Provide a "Next" button to navigate to {@link UpgradeScene#show(Stage, GameEngine)}</li>
+ * </ul>
+ *
+ * <p>UI notes:</p>
+ * <ul>
+ *     <li>This scene uses a fixed window size of 1280 by 720 and disables resizing</li>
+ *     <li>Hero icons are displayed with a drop shadow for depth</li>
+ * </ul>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class VictoryScene {
 
+    /**
+     * Shows the victory screen.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *     <li>Updates the global game state to {@link GameState#VICTORY}</li>
+     *     <li>Resets the selected upgrade hero to {@code null}</li>
+     *     <li>Builds and displays the JavaFX UI</li>
+     * </ul>
+     *
+     * <p>Navigation:</p>
+     * <ul>
+     *     <li>Clicking "Next" opens {@link UpgradeScene}</li>
+     * </ul>
+     *
+     * @param stage the primary JavaFX stage used to show the scene
+     * @param gameEngine the main game engine instance used for navigation and global state
+     */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.setGameState(GameState.VICTORY);
+        MusicPlayer.playMusic(GameState.VICTORY);
+
         VBox root = new VBox();
-        root.setPadding(new Insets(133,0,0,0));
+        root.setPadding(new Insets(133, 0, 0, 0));
         root.setAlignment(Pos.TOP_CENTER);
 
         GameEngine.setUpgradeHero(null);
@@ -42,7 +87,11 @@ public class VictoryScene {
         );
         root.setBackground(new Background(bgImage));
 
-        Font font1 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),30);
+        // Title
+        Font font1 = Font.loadFont(
+                CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),
+                30
+        );
         Text title = new Text("Level  up");
         title.setFont(font1);
 
@@ -62,7 +111,7 @@ public class VictoryScene {
             ImageView charImg = createCharacterImage(base + h.getName() + "Icon.PNG");
 
             Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-            Text scale = new Text("HP :  before > after\nATK : before > after\nDEF : before > after\n");
+            Text scale = new Text("HP  ->  " + (int)Math.floor(h.getHp() * 1.1) + "\nATK  ->  " + (int)Math.floor(h.getAtk() * 1.1) + "\nDEF  ->  " + (int)Math.floor(h.getDef() + 1) + "\n");
             scale.setFont(font2);
             scale.setLineSpacing(8);
 
@@ -92,6 +141,14 @@ public class VictoryScene {
         stage.show();
     }
 
+    /**
+     * Creates a hero icon {@link ImageView} for display on the victory screen.
+     *
+     * <p>The icon is styled with a drop shadow and fixed sizing.</p>
+     *
+     * @param imagePath1 resource path to the hero icon image
+     * @return an {@link ImageView} configured for this scene
+     */
     public static ImageView createCharacterImage(String imagePath1) {
 
         DropShadow shadow = new DropShadow();
@@ -113,6 +170,14 @@ public class VictoryScene {
         return iv1;
     }
 
+    /**
+     * Creates an image-based button with hover scaling, glow effect, and press animation.
+     *
+     * <p>This helper is used for the "Next" button.</p>
+     *
+     * @param path resource path of the button image
+     * @return a styled JavaFX {@link Button}
+     */
     private static Button createButton(String path) {
 
         Image img = new Image(CharacterSelectionScene.class.getResourceAsStream(path));

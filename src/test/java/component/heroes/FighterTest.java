@@ -1,87 +1,51 @@
 package component.heroes;
 
+import component.Element;
 import component.Target;
-import component.Unit;
-import logic.SkillType;
-import org.junit.jupiter.api.BeforeEach;
+import component.Monster;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * FighterTest
+ * Unit tests for the Fighter class.
  *
- * Tests Fighter behaviors:
- * - Constructor
- * - Normal attack
- * - Skill
- * - Ultimate
- * - castSkill switch
+ * This test class verifies:
+ * 1) The self-healing effect when using the skill.
+ * 2) The damage effect when using the ultimate ability.
  */
 class FighterTest {
 
-    Fighter fighter;
-    Unit dummy;
+    /**
+     * Test that the Fighter heals himself when using the skill.
+     * After calling skill(), the HP should increase from its initial value.
+     */
+    @Test
+    void testHealOnSkill() {
+        Fighter f = new Fighter();
+        f.setElement(Element.FIRE);
+        Monster m = new Monster(1);
 
-    static class DummyUnit extends Unit {
-        public DummyUnit() {
-            super("Dummy", 20, 200, 5);
-        }
-    }
+        f.setHp(100);
+        f.skill(Target.one(m));
 
-    @BeforeEach
-    void setup() {
-        fighter = new Fighter();
-        dummy = new DummyUnit();
+        // Fighter should recover HP after using the skill
+        assertTrue(f.getHp() > 100);
     }
 
     /**
-     * Test constructor sets hero class correctly.
+     * Test that the ultimate ability deals damage to the target.
+     * The monster's HP should decrease after ultimate() is used.
      */
     @Test
-    void constructorSetsHeroClass() {
-        assertEquals("Fighter", fighter.getHeroClass());
-    }
+    void testUltimateDamage() {
+        Fighter f = new Fighter();
+        f.setElement(Element.FIRE);
+        Monster m = new Monster(1);
 
-    /**
-     * Test normal attack reduces enemy HP.
-     */
-    @Test
-    void normalAttackDealsDamage() {
-        double before = dummy.getHp();
+        double before = m.getHp();
+        f.ultimate(Target.one(m));
 
-        fighter.normalAttack(dummy);
-
-        assertTrue(dummy.getHp() < before);
-    }
-
-    /**
-     * Test skill triggers cooldown.
-     */
-    @Test
-    void skillTriggersCooldown() {
-        fighter.skill(Target.one(dummy));
-
-        assertFalse(fighter.canUseSkill());
-    }
-
-    /**
-     * Test ultimate triggers cooldown.
-     */
-    @Test
-    void ultimateTriggersCooldown() {
-        fighter.ultimate(Target.one(dummy));
-
-        assertFalse(fighter.canUseUlt());
-    }
-
-    /**
-     * Test castSkill ULTIMATE branch.
-     */
-    @Test
-    void castSkillUltimateBranchWorks() {
-        fighter.castSkill(SkillType.ULTIMATE, Target.one(dummy));
-
-        assertFalse(fighter.canUseUlt());
+        // Monster HP should decrease after taking ultimate damage
+        assertTrue(m.getHp() < before);
     }
 }

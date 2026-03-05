@@ -78,3 +78,8 @@ jar {
     // Set archive name
     archiveFileName = "${project.name}-${project.version}-with-sources.jar"
 }
+javadoc {
+    destinationDir = file("$projectDir/doc")
+    options.encoding = 'UTF-8'
+    options.memberLevel = JavadocMemberLevel.PRIVATE // ถ้าอยากให้ private ก็ถูก generate ด้วย (เลือกได้)
+}

@@ -21,22 +21,70 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 import logic.RandomElementGenerator;
 
 import java.util.ArrayList;
 
+/**
+ * The {@code RollElementScene} class renders the element rolling screen shown before a battle.
+ *
+ * <p>This scene is responsible for:</p>
+ * <ul>
+ *     <li>Advancing the stage counter (battle stage progression)</li>
+ *     <li>Spawning a new monster team using {@link GameEngine#setMonsterTeam()}</li>
+ *     <li>Assigning random elements to monsters and heroes via {@link RandomElementGenerator}</li>
+ *     <li>Allowing the player to re-roll hero elements up to a fixed limit</li>
+ *     <li>Providing a start button to enter the battle scene</li>
+ * </ul>
+ *
+ * <p>Reroll behavior:</p>
+ * <ul>
+ *     <li>At the start of this scene, reroll count is reset to zero</li>
+ *     <li>The player can reroll hero elements up to {@link GameEngine#getMaxReroll()}</li>
+ *     <li>Rerolling updates the hero element display and the remaining roll counter</li>
+ * </ul>
+ *
+ * <p>UI notes:</p>
+ * <ul>
+ *     <li>The left panel shows the roll title and the element effectiveness table</li>
+ *     <li>The right panel shows monster elements, hero elements, and action buttons</li>
+ * </ul>
+ *
+ * @author Puttisan
+ * @version 1.0
+ */
 public class RollElementScene {
 
+    /**
+     * Displays the roll element scene on the provided stage.
+     *
+     * <p>This method performs game-state setup, creates UI panels, rolls initial elements,
+     * and shows the screen at 1280 by 720 resolution.</p>
+     *
+     * <p>Side effects:</p>
+     * <ul>
+     *     <li>Increases stage counter by 1</li>
+     *     <li>Resets reroll count to 0</li>
+     *     <li>Sets game state to {@link GameState#ROLL_ELEMENT}</li>
+     *     <li>Spawns a new monster team</li>
+     *     <li>Assigns random elements to both teams</li>
+     * </ul>
+     *
+     * @param stage the JavaFX stage where this scene is shown
+     * @param gameEngine the main game engine instance used for navigation and state
+     */
     public static void show(Stage stage, GameEngine gameEngine) {
         GameEngine.addStageCounter(1);
         GameEngine.setCountReroll(0);
         GameEngine.setGameState(GameState.ROLL_ELEMENT);
+        MusicPlayer.playMusic(GameState.START_GAME);
         HBox root = new HBox();
         root.setPadding(new Insets(100));
         root.setSpacing(30);
         root.setAlignment(Pos.CENTER);
 
-        // ===== Background (TOP-CENTER pinned like we did before) =====
+        // ===== Background =====
         Image bg = new Image(application.Main.class.getResource("/Background/RollElement.png").toExternalForm());
         BackgroundImage bgImage = new BackgroundImage(
                 bg,
@@ -44,13 +92,12 @@ public class RollElementScene {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(
-                        100, 100, true, true, true, true // IMPORTANT: scale background
+                        100, 100, true, true, true, true
                 )
         );
         root.setBackground(new Background(bgImage));
 
-
-        // ===== Left Panel =====
+        // ===== Left Panel (rightPanel variable name kept as original code) =====
         VBox rightPanel = new VBox();
         rightPanel.setAlignment(Pos.CENTER);
         rightPanel.setSpacing(15);
@@ -85,7 +132,7 @@ public class RollElementScene {
         }
 
         int leftRoll = Math.max(0, (GameEngine.getMaxReroll() - GameEngine.getCountReroll()));
-        Font font = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
+        Font font = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(), 15);
         Text leftRollText = new Text("Roll  left : " + leftRoll + " / 3");
         leftRollText.setFont(font);
         leftRollText.setStyle("-fx-fill: #4d2c12;");
@@ -106,6 +153,7 @@ public class RollElementScene {
             imgView.setFitWidth(100);
             imgView.setFitHeight(100);
             imgView.setPreserveRatio(true);
+
             DropShadow shadow = new DropShadow();
             shadow.setRadius(20);
             shadow.setSpread(0.4);
@@ -113,7 +161,9 @@ public class RollElementScene {
             shadow.setOffsetY(15);
             shadow.setColor(Color.rgb(0, 0, 0, 0.85));
 
-            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Heroes/" + heroesTeam.get(index).getName() + "/"+ heroesTeam.get(index).getName() + "Icon.PNG"));
+            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream(
+                    "/Heroes/" + heroesTeam.get(index).getName() + "/" + heroesTeam.get(index).getName() + "Icon.PNG"
+            ));
             ImageView iv = new ImageView(iconImg);
 
             iv.setFitWidth(100);
@@ -122,10 +172,8 @@ public class RollElementScene {
             iv.setSmooth(true);
             iv.setEffect(shadow);
 
-            StackPane overlay = new StackPane(imgView,iv);
-
+            StackPane overlay = new StackPane(imgView, iv);
             StackPane.setAlignment(imgView, Pos.TOP_RIGHT);
-
             overlay.setPrefSize(175, 175);
 
             heroElementBox.getChildren().add(overlay);
@@ -137,9 +185,7 @@ public class RollElementScene {
         rollBtn.setOnAction(e -> rollBtnHandler(leftRollText, heroElementBox));
 
         Button startBtn = createButton("/Button/Start.png");
-        startBtn.setOnAction(e -> {
-            BattleScene.show(stage,gameEngine);
-        });
+        startBtn.setOnAction(e -> BattleScene.show(stage, gameEngine));
 
         HBox bothBtn = new HBox(rollBtn, startBtn);
         bothBtn.setSpacing(50);
@@ -149,10 +195,9 @@ public class RollElementScene {
         center.setAlignment(Pos.CENTER);
         center.setSpacing(15);
 
-        // ✅ left panel now DOES NOT include title
         rightPanel.getChildren().addAll(description1, center);
 
-        // ===== Right Panel (Title moved here) =====
+        // ===== Right Panel (leftPanel variable name kept as original code) =====
         VBox leftPanel = new VBox();
         leftPanel.setAlignment(Pos.TOP_CENTER);
         leftPanel.setSpacing(20);
@@ -184,6 +229,22 @@ public class RollElementScene {
         stage.show();
     }
 
+    /**
+     * Handles the reroll button logic for hero elements.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *     <li>Prevents reroll when reroll count has reached the maximum limit</li>
+     *     <li>Increments reroll count by 1</li>
+     *     <li>Clears the current hero element UI</li>
+     *     <li>Assigns new random elements to all heroes</li>
+     *     <li>Rebuilds the hero element UI overlays</li>
+     *     <li>Updates the remaining roll text</li>
+     * </ul>
+     *
+     * @param leftRollText text node showing remaining rolls
+     * @param heroElementBox container holding hero element overlays
+     */
     private static void rollBtnHandler(Text leftRollText, HBox heroElementBox) {
 
         if (GameEngine.getCountReroll() >= GameEngine.getMaxReroll()) {
@@ -209,6 +270,7 @@ public class RollElementScene {
             imgView.setFitWidth(100);
             imgView.setFitHeight(100);
             imgView.setPreserveRatio(true);
+
             DropShadow shadow = new DropShadow();
             shadow.setRadius(20);
             shadow.setSpread(0.4);
@@ -216,7 +278,9 @@ public class RollElementScene {
             shadow.setOffsetY(15);
             shadow.setColor(Color.rgb(0, 0, 0, 0.85));
 
-            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream("/Heroes/" + heroesTeam.get(index).getName() + "/"+ heroesTeam.get(index).getName() + "Icon.PNG"));
+            Image iconImg = new Image(CharacterSelectionScene.class.getResourceAsStream(
+                    "/Heroes/" + heroesTeam.get(index).getName() + "/" + heroesTeam.get(index).getName() + "Icon.PNG"
+            ));
             ImageView iv = new ImageView(iconImg);
 
             iv.setFitWidth(100);
@@ -225,10 +289,8 @@ public class RollElementScene {
             iv.setSmooth(true);
             iv.setEffect(shadow);
 
-            StackPane overlay = new StackPane(imgView,iv);
-
+            StackPane overlay = new StackPane(imgView, iv);
             StackPane.setAlignment(imgView, Pos.TOP_RIGHT);
-
             overlay.setPrefSize(175, 175);
 
             heroElementBox.getChildren().add(overlay);
@@ -239,6 +301,15 @@ public class RollElementScene {
         leftRollText.setText("Roll  left : " + leftRoll + " / 3");
     }
 
+    /**
+     * Creates an image-based JavaFX button with hover glow, hover scale,
+     * and press translation animations.
+     *
+     * <p>The returned button is transparent and uses an image as its graphic.</p>
+     *
+     * @param path resource path to the button image
+     * @return a configured JavaFX {@link Button}
+     */
     private static Button createButton(String path) {
 
         Image pickImg = new Image(
@@ -260,12 +331,10 @@ public class RollElementScene {
             -fx-cursor: hand;
         """);
 
-        // ===== Glow Effect =====
         DropShadow glow = new DropShadow();
         glow.setColor(Color.BLACK);
         glow.setRadius(20);
 
-        // ===== Hover Scale =====
         ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), btn);
         scaleUp.setToX(1.1);
         scaleUp.setToY(1.1);
@@ -284,7 +353,6 @@ public class RollElementScene {
             scaleDown.playFromStart();
         });
 
-        // ===== Press Effect =====
         TranslateTransition press = new TranslateTransition(Duration.millis(100), btn);
         press.setToY(3);
 
