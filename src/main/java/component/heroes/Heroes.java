@@ -2,6 +2,7 @@ package component.heroes;
 
 import component.Target;
 import component.Unit;
+import logic.GameEngine;
 
 /**
  * Abstract base class for all playable heroes.
@@ -209,6 +210,7 @@ public abstract class Heroes extends Unit {
      * <p>HP is updated while keeping the same HP percentage as before scaling.</p>
      */
     public void scale() {
+        if(GameEngine.getStageCounter()==0) return;
         double frac = getMaxHp() <= 0 ? 0 : getHp() / getMaxHp();
         setMaxHp(getMaxHp() * 1.1);
         setHp(frac * getMaxHp());
