@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.GameEngine;
 import logic.GameState;
+import logic.MusicPlayer;
 import logic.RandomElementGenerator;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class RollElementScene {
         GameEngine.addStageCounter(1);
         GameEngine.setCountReroll(0);
         GameEngine.setGameState(GameState.ROLL_ELEMENT);
-
+        MusicPlayer.playMusic(GameState.START_GAME);
         HBox root = new HBox();
         root.setPadding(new Insets(100));
         root.setSpacing(30);
