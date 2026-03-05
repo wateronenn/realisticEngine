@@ -210,7 +210,7 @@ public abstract class Heroes extends Unit {
      * <p>HP is updated while keeping the same HP percentage as before scaling.</p>
      */
     public void scale() {
-        if(GameEngine.getStageCounter()==0) return;
+        if(GameEngine.getStageCounter()==1) return;
         double frac = getMaxHp() <= 0 ? 0 : getHp() / getMaxHp();
         setMaxHp(getMaxHp() * 1.1);
         setHp(frac * getMaxHp());
