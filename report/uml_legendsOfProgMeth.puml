@@ -1,0 +1,575 @@
+@startuml
+class gui.BattleSceneTemp {
+- {static} Pane heroBox
+- {static} Pane monsterBox
+- {static} Label logLabel
+- {static} Label stageLabel
+- {static} Button normalBtn
+- {static} BattleEngine engine
+- {static} BattleModel model
+- {static} Map<Heroes,Region> heroCardMap
+- {static} Map<Monster,Region> monsterCardMap
+- {static} Map<Heroes,HpBarUI> heroHpMap
+- {static} Map<Monster,HpBarUI> monsterHpMap
+- {static} Map<Heroes,ImageView> heroImageMap
+- {static} Map<Monster,ImageView> monsterImageMap
+- {static} Map<Heroes,Animation> heroTempAnimMap
+- {static} BattleStage lastStage
+- {static} Heroes lastActiveHero
+- {static} Heroes heroBeforeMonsterTurn
+- {static} DropShadow TURN_GLOW
+- {static} DropShadow HOVER_GLOW
+- {static} String[] monsterType
+- {static} void playHitAnimation(Region)
+- {static} Image loadImageSafe(String,String)
+- {static} Image heroIdleImg(Heroes)
+- {static} Image heroAttackImg(Heroes)
+- {static} void showAttackFor1_5s(Heroes)
+- {static} boolean isHeroDecisionStage(BattleStage)
+- {static} Heroes safeGetActiveHero()
+- {static} void handleEndTurnAttackImage(BattleStage)
++ {static} void show(Stage,GameEngine)
+- {static} void buildUnits()
+- {static} void updateUnitsAnimated()
+- {static} VBox unitCardWithHpBar_Hero(double,boolean,Heroes)
+- {static} VBox unitCardWithHpBar_Monster(String,double,boolean,Element,Monster)
+- {static} void setupHoverGlow(Region,BooleanSupplier)
+- {static} void refreshButtons()
+- {static} void refreshTurnGlow()
+- {static} void refreshInteractivity(BattleStage)
+- {static} void setHeroInputEnabled(boolean)
+- {static} void styleButton(Button)
+}
+
+
+class gui.BattleSceneTemp$HpBarUI {
+~ double barW
+~ double barH
+~ Rectangle bg
+~ Rectangle border
+~ Rectangle fill
+~ Rectangle dmg
+~ Label text
+~ double maxHp
+~ double currentHp
+~ <<Create>> HpBarUI(double,double)
+- void round(Rectangle)
+~ StackPane node()
+~ void setInstant(double)
+~ void animateTo(double)
+- void updateColor(double)
+- {static} double clamp01(double)
+}
+
+
+class component.MonsterFactory {
+- {static} int TEAM_SIZE
+- Random rng
++ <<Create>> MonsterFactory()
++ ArrayList<Monster> spawnMonster(int)
+- int rollType(int,int)
+}
+
+
+enum logic.SkillType {
++  NORMAL_ATTACK
++  SKILL
++  ULTIMATE
+}
+
+class logic.RandomElementGenerator {
++ {static} ArrayList<Element> getRandomElement(ArrayList<? extends Unit>)
++ {static} Image getElementImage(Element)
+}
+
+class component.heroes.Caster {
++ <<Create>> Caster()
++ void normalAttack(Unit)
++ void skill(Target)
++ void ultimate(Target)
++ void buff(Unit)
++ void castSkill(SkillType,Target)
+}
+
+enum logic.Character {
++  CASTER
++  ARCHER
++  TANK
++  FIGHTER
+}
+
+class logic.BattleModel {
+- List<Heroes> HERO_TEAM
+- List<Monster> MONSTER_TEAM
+- int activeHeroIndex
+- SkillType pendingSkill
++ <<Create>> BattleModel(List<Heroes>,List<Monster>)
++ List<Heroes> getHERO_TEAM()
++ List<Monster> getMONSTER_TEAM()
++ int getActiveHeroIndex()
++ void setActiveHeroIndex(int)
++ SkillType getPendingSkill()
++ void setPendingSkill(SkillType)
+}
+
+
+interface component.Buffing {
+~ void buff(Unit)
+}
+
+interface logic.BattleListener {
+~ void onStateChanged(BattleStage)
+~ void onLog(String)
+~ void onModelUpdated()
+}
+
+class logic.BattleEngine {
+- BattleModel model
+- BattleStage stage
+- BattleListener listener
+- int turnCounter
++ <<Create>> BattleEngine(BattleModel)
++ void setListener(BattleListener)
++ BattleModel getModel()
++ BattleStage getStage()
++ void beginBattle()
++ boolean onClickHeroSkill(SkillType)
++ boolean onClickChoosingTarget(int)
++ boolean onClickChoosingAlly(Heroes)
++ void onCancelSelection()
+- int findNextAliveHeroIndex(int)
+- void resolveHeroAction(Heroes,Target,SkillType)
+- void afterHeroAction()
++ void monsterAttackOne(Monster)
++ void executeMonsterTurnAndContinue()
+- void resetHeroShield()
+- Heroes pickRandomAliveHero()
+- Heroes getActiveHero()
+- Monster getActiveMonster(int)
+- void tickCooldownsForHeroes()
+- boolean isMonsterAllDead()
+- boolean isHeroAllDead()
+- {static} TargetType checkSkillTarget(Heroes,SkillType)
++ BattleStage getBattleStage()
++ void setBattleStage(BattleStage)
++ int getTurnCounter()
++ void setTurnCounter(int)
++ void emitState(BattleStage)
++ void emitUpdate()
++ void emitLog(String)
+}
+
+
+class component.heroes.Tank {
++ <<Create>> Tank()
++ void normalAttack(Unit)
++ void skill(Target)
++ void heal(Unit)
++ void buff(Unit)
++ void ultimate(Target)
++ void castSkill(SkillType,Target)
+}
+
+enum logic.TargetType {
++  ENEMY_ONE
++  ENEMY_ALL
++  ALLY_ONE
++  ALLY_ALL
++  SELF
++  NONE
+}
+
+class component.heroes.Archer {
+- int bowStack
++ <<Create>> Archer()
++ void normalAttack(Unit)
++ void skill(Target)
++ void ultimate(Target)
++ void resetBow()
++ void increaseBowStack()
++ int getBowStack()
++ void castSkill(SkillType,Target)
+}
+
+
+enum logic.GameState {
++  START_GAME
++  SELECT_TEAM
++  ROLL_ELEMENT
++  BATTLE
++  VICTORY
++  UPGRADE
++  DEFEAT
+}
+
+class logic.MusicPlayer {
+- {static} MediaPlayer bgmPlayer
++ {static} void playMusic(GameState)
++ {static} void stopMusic()
++ {static} void pauseMusic()
++ {static} void resumeMusic()
+}
+
+
+class gui.CharacterSelectionScene {
+- {static} Runnable resetCurrentSelection
+- {static} String[][] discription
++ {static} void show(Stage,GameEngine)
+- {static} void startBtnOnClickHandler(Stage,GameEngine)
+- {static} void pickBtnOnClickHandler(GameEngine,Heroes,Button)
++ {static} Button createCharacterButton(String,String,int)
+- {static} Button createButton(String)
+}
+
+
+class gui.RollElementScene {
++ {static} void show(Stage,GameEngine)
+- {static} void rollBtnHandler(Text,HBox)
+- {static} Button createButton(String)
+}
+
+class application.Main {
++ void start(Stage)
++ {static} void main(String[])
+}
+
+class gui.StartScene {
++ {static} void showMenu(Stage,GameEngine)
++ {static} Button createStartButton()
+}
+
+abstract class component.heroes.Heroes {
+- double shield
+- double atkMul
+- double atkFlat
+- int atkBuffTurns
+- String heroClass
+# Integer actionOrder
+# int skillCdMax
+# int skillCdRemain
+# int ultCdMax
+# int ultCdRemain
++ <<Create>> Heroes(String,double,double,double)
+# void setActionOrder(Integer)
++ Integer getActionOrder()
++ void setShield(double)
++ double getShield()
++ double takeDamage(double)
++ void applyAtkBuff(double,double,int)
+# double healAmount(Unit,double)
++ double effectiveAtk()
++ {abstract}void normalAttack(Unit)
++ {abstract}void skill(Target)
++ {abstract}void ultimate(Target)
++ void upgrade()
++ void scale()
++ void setHeroClass(String)
++ String getHeroClass()
++ void setAtkMul(double)
++ void setAtkBuffTurns(int)
++ void setAtkFlat(double)
++ double getAtkFlat()
++ double getAtkMul()
++ int getAtkBuffTurns()
++ boolean canUseSkill()
++ boolean canUseUlt()
++ void triggerSkillCd()
++ void triggerUltCd()
++ void tickCooldowns()
++ void resetAllCooldowns()
++ int getSkillCdRemain()
++ int getUltCdRemain()
++ void resetAfterTurn()
+}
+
+
+class gui.VictoryScene {
++ {static} void show(Stage,GameEngine)
++ {static} ImageView createCharacterImage(String)
+- {static} Button createButton(String)
+}
+
+class gui.UpgradeScene {
+- {static} Runnable resetCurrentSelection
++ {static} void show(Stage,GameEngine)
++ {static} Button createCharacterButton(String,Heroes)
+- {static} Button createButton(String)
+- {static} boolean nextBtnOnClickHandler(Stage,GameEngine)
+}
+
+
+class gui.DefeatScene {
++ {static} void show(Stage,GameEngine)
+- {static} Button createButton(String)
+}
+
+class component.Target {
+- Unit single
+- List<? extends Unit> group
+- <<Create>> Target(Unit,List<? extends Unit>)
++ {static} Target one(Unit)
++ {static} Target many(List<? extends Unit>)
++ Unit single()
++ List<? extends Unit> many()
++ boolean isSingle()
++ boolean isMany()
+}
+
+
+class component.heroes.Fighter {
++ <<Create>> Fighter()
++ void normalAttack(Unit)
++ void ultimate(Target)
++ void skill(Target)
++ void heal(Unit)
++ void castSkill(SkillType,Target)
+}
+
+abstract class component.Unit {
+- String name
+- double atk
+- double hp
+- double def
+- double maxHp
+- Element element
++ <<Create>> Unit(String,double,double,double)
++ void setElement(Element)
++ void setName(String)
++ String getName()
++ double takeDamage(double)
++ double dmgReduction(double)
++ double getAtk()
++ double getDef()
++ boolean isDead()
++ double getHp()
++ void setMaxHp(double)
++ double getMaxHp()
++ void setAtk(double)
++ void setDef(double)
++ void setHp(double)
++ Element getElement()
++ double attack(Unit,double)
++ double getHpPercent()
++ void castSkill(SkillType,Target)
+}
+
+
+enum component.Element {
++  WATER
++  FIRE
++  NATURE
++  LIGHT
++  DARK
++ double getModifierAgainst(Element)
+}
+
+
+enum logic.BattleStage {
++  START_BATTLE
++  HERO_CHOOSE_SKILL
++  HERO_CHOOSE_TARGET
++  HERO_CHOOSE_ALLY
++  HERO_RESOLVE_ACTION
++  MONSTER_TURN
++  CHECK_END
++  WIN_TURN
++  LOSE_TURN
+}
+
+interface component.Healing {
+~ void heal(Unit)
+}
+
+class logic.GameEngine {
+- {static} int MAX_TEAM_SIZE
+- {static} int MAX_REROLL
++ {static} ArrayList<Heroes> TEAM
++ {static} ArrayList<Monster> MONSTER_TEAM
++ {static} int STAGE_COUNTER
++ {static} List<Heroes> AllHero
++ {static} Heroes upgradeHero
++ {static} GameState gameState
+- {static} int COUNT_REROLL
+- {static} MonsterFactory MONSTER_FACTORY
++ <<Create>> GameEngine()
++ void newGame()
++ {static} List<Heroes> getAvailableHeroes()
++ {static} boolean isInTeam(Heroes)
++ {static} boolean checkFullTeam()
++ {static} ArrayList<Heroes> getHeroTEAM()
++ {static} int getTeamSize()
++ {static} boolean toggleTeamMember(Heroes)
++ {static} void setUpgradeHero(Heroes)
++ {static} Heroes getUpgradeHero()
++ {static} void upgradingHero()
++ {static} int getMaxReroll()
++ {static} int getCountReroll()
++ {static} void setCountReroll(int)
++ {static} void addCountReroll(int)
++ {static} int getStageCounter()
++ {static} void setStageCounter(int)
++ {static} void addStageCounter(int)
++ {static} MonsterFactory getMonsterFactory()
++ {static} ArrayList<Monster> getMonsterTeam()
++ {static} void setMonsterTeam()
++ {static} void clearMonsterTeam()
++ {static} boolean isHeroAllDead()
++ {static} boolean isMonsterAllDead()
++ {static} GameState getGameState()
++ {static} void setGameState(GameState)
+}
+
+
+class component.Monster {
+- int type
++ <<Create>> Monster(int)
+- {static} int normalizeType(int)
+- {static} String getNameByType(int)
+- void applyBaseStats()
++ void scaleToStage(int)
++ double attack(Unit)
+}
+
+
+class gui.BattleScene {
+- {static} String SKILL_PANEL_BG_PATH
+- {static} String DESC_PANEL_BG_PATH
+- {static} String NORMAL_BTN_IMG_PATH
+- {static} String SKILL_BTN_IMG_PATH
+- {static} String ULT_BTN_IMG_PATH
+- {static} String CANCEL_BTN_IMG_PATH
+- {static} GameEngine GAMEENGINE
+- {static} Stage STAGE
+- {static} Pane heroBox
+- {static} Pane monsterBox
+- {static} StackPane heroElementPanelTopLeft
+- {static} StackPane monsterElementPanelTopRight
+- {static} Label logLabel
+- {static} Label stageLabel
+- {static} Button normalBtn
+- {static} Button cancelBtn
+- {static} Label heroNameLabel
+- {static} Label actionNameLabel
+- {static} Label actionDescLabel
+- {static} StackPane skillPanel
+- {static} StackPane descPanel
+- {static} Heroes currentTurnHero
+- {static} SkillType selectedSkillType
+- {static} HBox heroElementBoxTopLeft
+- {static} HBox monsterElementBoxTopRight
+- {static} Map<Heroes,ImageView> heroElementIconMap
+- {static} Map<Monster,ImageView> monsterElementIconMap
+- {static} BattleEngine engine
+- {static} BattleModel model
+- {static} Map<Heroes,Region> heroCardMap
+- {static} Map<Monster,Region> monsterCardMap
+- {static} Map<Heroes,HpBarUI> heroHpMap
+- {static} Map<Monster,HpBarUI> monsterHpMap
+- {static} Map<Heroes,ImageView> heroImageMap
+- {static} Map<Monster,ImageView> monsterImageMap
+- {static} Map<Heroes,Animation> heroTempAnimMap
+- {static} Map<Monster,Animation> monsterTempAnimMap
+- {static} Map<Monster,String> monsterTypeMap
+- {static} BattleStage lastStage
+- {static} Heroes lastActiveHero
+- {static} Heroes heroBeforeMonsterTurn
+- {static} DropShadow TURN_GLOW
+- {static} DropShadow HOVER_GLOW
+- {static} DropShadow BTN_GLOW
+- {static} StackPane stageCounterPanelTopCenter
+- {static} Label stageCounterLabel
+- {static} Map<String,SkillInfo> HERO_SKILLS
+- {static} void initHeroSkillsOnce()
+- {static} Button createImageButton(String,double,double)
+- {static} StackPane buildSkillPanel()
+- {static} StackPane buildSkillDescriptionPanel()
+- {static} void updateSkillDescription()
+- {static} StackPane buildStageCounterPanel(GameEngine)
+- {static} void updateStageCounter(GameEngine)
+- {static} void onHeroTurnStartedForHud(Heroes)
+- {static} void clearSkillButtonEffects()
+- {static} void playHitAnimation(Region)
+- {static} Image loadImageSafe(String,String)
+- {static} Image heroIdleImg(Heroes)
+- {static} Image heroAttackImg(Heroes)
+- {static} Image heroShieldImg(Heroes)
+- {static} Image heroDeadImg(Heroes)
+- {static} String monsterTypeName(Monster)
+- {static} Image monsterIdleImg(Monster)
+- {static} Image monsterDeadImg(Monster)
+- {static} Image monsterAttackImg(Monster)
+- {static} Image heroBaseImg(Heroes)
+- {static} Image monsterBaseImg(Monster)
+- {static} void showAttackFor1_5s(Heroes)
+- {static} void showMonsterAttackFor1s(Monster)
+- {static} void initTopCornerElementUI(AnchorPane)
+- {static} void rebuildTopCornerElementIcons()
+- {static} StackPane buildHeroElementOverlay(Heroes)
+- {static} StackPane buildMonsterElementOverlay(Monster)
+- {static} void refreshTopCornerElementIcons()
+- {static} boolean isHeroDecisionStage(BattleStage)
+- {static} Heroes safeGetActiveHero()
+- {static} void handleEndTurnAttackImage(BattleStage)
++ {static} void show(Stage,GameEngine)
+- {static} void buildUnits()
+- {static} void updateUnitsAnimated()
+- {static} VBox unitCardWithHpBar_Hero(double,boolean,Heroes)
+- {static} VBox unitCardWithHpBar_Monster(String,double,boolean,Element,Monster)
+- {static} void setupHoverGlow(Region,BooleanSupplier)
+- {static} void refreshButtons()
+- {static} void refreshTurnGlow()
+- {static} void refreshInteractivity(BattleStage)
+- {static} void playSingleMonsterAttack(Monster,Runnable,Runnable)
+- {static} void playAllMonstersAttack(List<Monster>,int,Runnable,java.util.function.Consumer<Monster>)
+- {static} void setHeroInputEnabled(boolean)
+- {static} GameEngine getGameEngine()
+- {static} Stage getStage()
+}
+
+
+class gui.BattleScene$SkillInfo {
+~ String normalName
+~ String skillName
+~ String ultName
+~ <<Create>> SkillInfo(String,String,String,String,String,String)
+~ String name(SkillType)
+~ String desc(SkillType)
+}
+
+
+class gui.BattleScene$HpBarUI {
+~ double barW
+~ double barH
+~ Rectangle bg
+~ Rectangle border
+~ Rectangle fill
+~ Rectangle dmg
+~ Label text
+~ double maxHp
+~ double currentHp
+~ <<Create>> HpBarUI(double,double)
+~ StackPane node()
+~ void setInstant(double)
+~ void animateTo(double)
+- void updateColor(double)
+- {static} double clamp01(double)
+}
+
+
+
+
+gui.BattleSceneTemp +.. gui.BattleSceneTemp$HpBarUI
+component.Buffing <|.. component.heroes.Caster
+component.heroes.Heroes <|-- component.heroes.Caster
+component.Healing <|.. component.heroes.Tank
+component.Buffing <|.. component.heroes.Tank
+component.heroes.Heroes <|-- component.heroes.Tank
+component.heroes.Heroes <|-- component.heroes.Archer
+javafx.application.Application <|-- application.Main
+component.Unit <|-- component.heroes.Heroes
+component.Healing <|.. component.heroes.Fighter
+component.heroes.Heroes <|-- component.heroes.Fighter
+component.Unit <|-- component.Monster
+gui.BattleScene +.. gui.BattleScene$SkillInfo
+gui.BattleScene +.. gui.BattleScene$HpBarUI
+@enduml
