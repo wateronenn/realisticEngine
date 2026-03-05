@@ -82,6 +82,11 @@ application {
 }
 ```
 ---
+## Run Jar File
+```
+java --module-path "C:\JavaFX\openjfx-24.0.2_windows-x64_bin-sdk\javafx-sdk-24.0.2\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -jar "progMethLab06-1-with-sources.jar"
+```
+---
 # Game Overview
 
 Legends of ProgMeth is a turn-based combat game where players choose heroes and fight monsters across multiple stages.
