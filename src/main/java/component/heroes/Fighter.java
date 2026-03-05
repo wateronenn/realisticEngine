@@ -21,7 +21,7 @@ import logic.SkillType;
  * <p>Cooldowns:
  * <ul>
  *     <li>Skill: 2 turns</li>
- *     <li>Ultimate: 4 turns</li>
+ *     <li>Ultimate: 5 turns</li>
  * </ul>
  *
  * <p>Abilities:
