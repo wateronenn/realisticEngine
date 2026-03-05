@@ -37,22 +37,22 @@ public class GameEngine {
     private static final int MAX_REROLL = 3;
 
     /** Current selected hero team for the player. */
-    public static ArrayList<Heroes> TEAM;
+    private static ArrayList<Heroes> TEAM;
 
     /** Current monster team for the current stage. */
-    public static ArrayList<Monster> MONSTER_TEAM;
+    private static ArrayList<Monster> MONSTER_TEAM;
 
     /** Current stage number (used for difficulty progression and monster spawning). */
-    public static int STAGE_COUNTER = 0;
+    private static int STAGE_COUNTER = 0;
 
     /** List of all heroes available for selection at the start of a game. */
-    public static List<Heroes> AllHero;
+    private static List<Heroes> AllHero;
 
     /** Selected hero to be upgraded, or null if no hero is selected. */
-    public static Heroes upgradeHero = null;
+    private static Heroes upgradeHero = null;
 
     /** Current high-level game state. */
-    public static GameState gameState;
+    private static GameState gameState;
 
     /** Number of rerolls already used. */
     private static int COUNT_REROLL = 0;
