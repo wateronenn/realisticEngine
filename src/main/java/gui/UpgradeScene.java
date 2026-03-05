@@ -132,7 +132,7 @@ public class UpgradeScene {
             Button charBtn = createCharacterButton(base + h.getName() + "Icon.PNG", h);
 
             Font font2 = Font.loadFont(CharacterSelectionScene.class.getResource("/Font/Supply_Center.ttf").toExternalForm(),15);
-            Text scale = new Text("HP  ->  " + (int)Math.floor((h.getHp() * 1.1) + 25) + "\nATK  ->  " + (int)Math.floor((h.getAtk() * 1.1) + 4) + "\nDEF  ->  " + (int)Math.floor((h.getDef() + 1) + 1) + "\n");
+            Text scale = new Text("HP  ->  " + (int)Math.floor((h.getMaxHp() * 1.1) + 25) + "\nATK  ->  " + (int)Math.floor((h.getAtk() * 1.1) + 4) + "\nDEF  ->  " + (int)Math.floor((h.getDef() + 1) + 1) + "\n");
             scale.setFont(font2);
             scale.setLineSpacing(8);
 
